@@ -3,6 +3,7 @@
   "license": "MIT",
   "description": "An unofficial basic dashboard to show information about some Actual Budget accounts",
   "scripts": {
+    "backend:serve": "nodemon --watch ./backend backend/src/app.ts",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -30,9 +31,10 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@actual-app/api": "^6.9.0",
+    "@actual-app/api": "^6.10.0",
     "dotenv": "^16.4.5",
-    "express": "^5.0.0",
-    "http-status-codes": "^2.3.0"
+    "express": "^4.19.2",
+    "http-status-codes": "^2.3.0",
+    "tslib": "^2.7.0"
   }
 }

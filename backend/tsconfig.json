@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "outDir": "../dist",
+    "target": "es2022",
+    "useDefineForClassFields": false,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noImplicitAny": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "files": ["src/app.ts"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts"],
+  "extends": "../tsconfig.base.json"
+}
