@@ -8,7 +8,6 @@ import { DI } from './services/di.service';
 
 const DEFAULT_PORT = 3000;
 
-// TODO: why?
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
 const app: Express = express();
 
@@ -46,6 +45,7 @@ app.use((error: Error, req: Request, res: Response) => {
 });
 
 (async () => {
+  // TODO: handle when remote budget cant be loaded
   await actualService.init();
 
   app.listen(port, () => {

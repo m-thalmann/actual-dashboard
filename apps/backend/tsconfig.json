@@ -1,7 +1,16 @@
 {
+  "extends": "../../tsconfig.base.json",
+  "files": [],
+  "include": [],
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
+    }
+  ],
   "compilerOptions": {
-    "outDir": "../dist",
-    "target": "es2022",
     "useDefineForClassFields": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
@@ -10,8 +19,5 @@
     "noImplicitReturns": true,
     "noImplicitAny": true,
     "noFallthroughCasesInSwitch": true
-  },
-  "files": ["src/app.ts"],
-  "include": ["src/**/*.ts", "src/**/*.d.ts"],
-  "extends": "../tsconfig.base.json"
+  }
 }

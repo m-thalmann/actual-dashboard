@@ -1,5 +1,7 @@
 const globals = require('globals');
 
+const nxPlugin = require('@nx/eslint-plugin');
+
 const baseConfig = require('@m-thalmann/eslint-config-base');
 const typescriptConfig = require('@m-thalmann/eslint-config-typescript');
 
@@ -7,7 +9,7 @@ const prettierConfig = require('eslint-config-prettier');
 
 module.exports = [
   {
-    ignores: ['dist/'],
+    ignores: ['dist/', '.nx'],
   },
 
   {
@@ -20,6 +22,7 @@ module.exports = [
     linterOptions: {
       reportUnusedDisableDirectives: 'error',
     },
+    plugins: { '@nx': nxPlugin },
   },
 
   {
@@ -30,6 +33,14 @@ module.exports = [
         tsconfigRootDir: __dirname,
       },
     },
+  },
+
+  {
+    files: ['*.spec.ts', '*.spec.js'],
+    env: {
+      jest: true,
+    },
+    rules: {},
   },
 
   ...baseConfig,

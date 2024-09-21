@@ -15,7 +15,7 @@ router.get('/accounts', async (req: Request, res: Response) => {
 router.get('/accounts/:accountId/balance', async (req: Request, res: Response) => {
   const actualService = DI.get(ActualService);
 
-  const accountId = req.params.accountId ?? '';
+  const accountId = req.params.accountId;
 
   const balance = await actualService.getAccountBalance(accountId);
 

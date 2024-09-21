@@ -1,0 +1,15 @@
+{
+  "name": "backend",
+  "private": true,
+  "author": "Matthias Thalmann",
+  "license": "MIT",
+  "scripts": {
+    "start": "node src/app"
+  },
+  "dependencies": {
+    "@actual-app/api": "^6.9.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "http-status-codes": "^2.3.0"
+  }
+}

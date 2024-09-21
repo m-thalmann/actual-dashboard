@@ -9,7 +9,7 @@ const router = Router();
 router.get('/accounts/:accountId/transactions', async (req: Request, res: Response) => {
   const actualService = DI.get(ActualService);
 
-  const accountId = req.params.accountId ?? '';
+  const accountId = req.params.accountId;
 
   const page = req.query.page === undefined ? 1 : parseInt(req.query.page as string, 10);
   const pageSize =
