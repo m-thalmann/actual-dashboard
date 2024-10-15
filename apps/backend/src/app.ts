@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express, { Express, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import path from 'path';
 import routes from './routes/routes';
 import { ActualConfig } from './services/actual.models';
 import { ActualService } from './services/actual.service';
@@ -21,7 +22,8 @@ const actualConfig: ActualConfig = {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   syncId: process.env.ACTUAL_SERVER_SYNC_ID!,
   filePassword: process.env.ACTUAL_SERVER_FILE_PASSWORD,
-  dataDir: './data',
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+  dataDir: path.resolve(__dirname, '../data'),
   allowedAccounts: [],
 };
 

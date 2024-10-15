@@ -8,8 +8,8 @@
     "serve": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": ["nodemon src/app.ts"],
-        "cwd": "apps/backend",
+        "commands": ["nodemon --watch ./ --ignore ./data src/app.ts"],
+        "cwd": "{projectRoot}",
         "parallel": false
       }
     },
