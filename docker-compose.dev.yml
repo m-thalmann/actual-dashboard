@@ -1,0 +1,9 @@
+version: '3'
+services:
+  actual_server:
+    image: docker.io/actualbudget/actual-server:latest
+    ports:
+      - '5555:5006'
+    volumes:
+      - ./tmp/container-data:/data
+    restart: no
