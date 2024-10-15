@@ -29,7 +29,7 @@ module.exports = [
     files: ['**/*.ts'],
     languageOptions: {
       parserOptions: {
-        project: ['./tsconfig.base.json', './backend/tsconfig.json'],
+        project: ['./tsconfig.base.json', './apps/backend/tsconfig**.json'],
         tsconfigRootDir: __dirname,
       },
     },

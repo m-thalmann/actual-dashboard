@@ -10,6 +10,7 @@
     "@actual-app/api": "^24.10.1",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "http-status-codes": "^2.3.0"
+    "http-status-codes": "^2.3.0",
+    "swagger-ui-express": "^5.0.1"
   }
 }

@@ -14,6 +14,8 @@
 1. Start the backend: `npx nx serve backend`
 1. Start the frontend: `npx nx serve frontend`
 
+> API Documentation: http://localhost:3000/docs
+
 ## Production Build
 
 `npx nx run-many -t build`
