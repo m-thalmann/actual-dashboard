@@ -1,3 +1,4 @@
+import cors from 'cors';
 import 'dotenv/config';
 import express, { Express, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
@@ -11,6 +12,9 @@ const DEFAULT_PORT = 3000;
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
 const app: Express = express();
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-call
+app.use(cors());
 
 const port = process.env.PORT || DEFAULT_PORT;
 
