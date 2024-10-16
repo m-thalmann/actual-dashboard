@@ -15,5 +15,39 @@
       },
       "exclude": []
     }
-  ]
+  ],
+  "targetDefaults": {
+    "@angular-devkit/build-angular:application": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["default", "^default"]
+    },
+    "@nx/eslint:lint": {
+      "cache": true,
+      "inputs": ["default", "{workspaceRoot}/eslint.config.js"]
+    }
+  },
+  "generators": {
+    "@nx/angular:application": {
+      "e2eTestRunner": "none",
+      "linter": "eslint",
+      "style": "scss",
+      "unitTestRunner": "jest"
+    },
+    "@nx/angular:component": {
+      "style": "scss",
+      "standalone": true,
+      "changeDetection": "OnPush",
+      "displayBlock": true,
+      "nameAndDirectoryFormat": "derived"
+    },
+    "@nx/angular:directive": {
+      "standalone": true,
+      "nameAndDirectoryFormat": "derived"
+    },
+    "@nx/angular:pipe": {
+      "standalone": true,
+      "nameAndDirectoryFormat": "derived"
+    }
+  }
 }
