@@ -7,8 +7,8 @@ import { BaseApiService } from './base-api.service';
 export class AccountsDataService {
   private readonly baseApiService: BaseApiService = inject(BaseApiService);
 
-  getAccounts(): Observable<Account> {
-    return this.baseApiService.get<Account>(`accounts`);
+  getAccounts(): Observable<Array<Account>> {
+    return this.baseApiService.get<Array<Account>>(`accounts`);
   }
 
   getAccountBalance(accountId: string): Observable<number | null> {
