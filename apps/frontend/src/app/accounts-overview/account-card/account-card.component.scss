@@ -1,0 +1,39 @@
+:host {
+  display: block;
+}
+
+a {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  text-decoration: none;
+  padding: 1em;
+
+  color: inherit;
+  background: rgba(0, 0, 0, 0.125);
+
+  border-radius: 1em;
+
+  transition: background 0.2s;
+
+  .content {
+    display: flex;
+    flex-direction: column;
+
+    .amount {
+      opacity: 0.5;
+
+      &.positive {
+        color: #0ab50a;
+      }
+
+      &.negative {
+        color: #ff4f23;
+      }
+    }
+  }
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.25);
+  }
+}

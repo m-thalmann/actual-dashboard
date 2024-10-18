@@ -1,0 +1,10 @@
+<a [routerLink]="['/accounts', account().id]">
+  <span class="icon">💵</span>
+
+  <span class="content">
+    <span class="name">{{ account().name }}</span>
+    <span class="amount" [class.positive]="account().amount > 0" [class.negative]="account().amount < 0">
+      {{ account().amount / 100 | currency }}
+    </span>
+  </span>
+</a>

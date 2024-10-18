@@ -1,5 +1,5 @@
 import { Route } from '@angular/router';
-import { AccountsPageComponent } from './pages/accounts-page/accounts-page.component';
+import { AccountsOverviewComponent } from './accounts-overview/accounts-overview.component';
 
 export const appRoutes: Array<Route> = [
   {
@@ -9,6 +9,6 @@ export const appRoutes: Array<Route> = [
   },
   {
     path: 'accounts',
-    component: AccountsPageComponent,
+    component: AccountsOverviewComponent,
   },
 ];

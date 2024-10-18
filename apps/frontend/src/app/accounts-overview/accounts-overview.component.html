@@ -1,0 +1,5 @@
+<div class="accounts">
+  @for (account of accounts(); track account.id) {
+    <app-account-card [account]="account" />
+  }
+</div>

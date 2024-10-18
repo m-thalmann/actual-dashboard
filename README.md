@@ -4,7 +4,7 @@
 
 1. Install the dependencies: `npm install`
 1. Copy the `.env.example` file to `.env`
-1. Start a development Actual server: `docker compose -f docker-compose.dev.yml up`
+1. Start a development Actual server using docker: `npm run actual-server`
    - Open the Actual client: http://localhost:5555
    - Set a server password
    - Create an empty budget file (or import one of yours)

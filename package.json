@@ -3,7 +3,8 @@
   "license": "MIT",
   "description": "An unofficial basic dashboard to show information about some Actual Budget accounts",
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "actual-server": "docker compose -f docker-compose.dev.yml up"
   },
   "lint-staged": {
     "*": [
