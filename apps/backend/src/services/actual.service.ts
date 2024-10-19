@@ -36,18 +36,33 @@ export class ActualService {
     return queryData.data;
   }
 
-  async getAccountBalance(accountId: string): Promise<number> {
+  // async getAccountBalance(accountId: string): Promise<number> {
+  //   if (!this.isAllowedAccount(accountId)) {
+  //     return 0;
+  //   }
+
+  //   const query = q('transactions')
+  //     .filter({ account: { $eq: accountId } })
+  //     .select([{ amount: { $sum: '$amount' } }]);
+
+  //   const queryData = (await runQuery(query)) as { data: [{ amount: number }] };
+
+  //   return queryData.data[0].amount;
+  // }
+
+  async getAccountDetails(accountId: string): Promise<Account | null> {
     if (!this.isAllowedAccount(accountId)) {
-      return 0;
+      return null;
     }
 
     const query = q('transactions')
       .filter({ account: { $eq: accountId } })
-      .select([{ amount: { $sum: '$amount' } }]);
+      .groupBy('account')
+      .select([{ id: 'account' }, { name: 'account.name' }, { amount: { $sum: '$amount' } }]);
 
-    const queryData = (await runQuery(query)) as { data: [{ amount: number }] };
+    const queryData = (await runQuery(query)) as { data: Array<Account> };
 
-    return queryData.data[0].amount;
+    return queryData.data[0] ?? null;
   }
 
   async getTransactions(accountId: string, limit?: number, offset?: number): Promise<Array<Transaction>> {

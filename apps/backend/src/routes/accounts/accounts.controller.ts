@@ -1,4 +1,5 @@
 import { Request, Response, Router } from 'express';
+import { StatusCodes } from 'http-status-codes';
 import { ActualService } from '../../services/actual.service';
 import { DI } from '../../services/di.service';
 
@@ -12,14 +13,19 @@ router.get('/accounts', async (req: Request, res: Response) => {
   res.json(accounts);
 });
 
-router.get('/accounts/:accountId/balance', async (req: Request, res: Response) => {
+router.get('/accounts/:accountId', async (req: Request, res: Response) => {
   const actualService = DI.get(ActualService);
 
   const accountId = req.params.accountId;
 
-  const balance = await actualService.getAccountBalance(accountId);
+  const details = await actualService.getAccountDetails(accountId);
 
-  res.json(balance);
+  if (details === null) {
+    res.status(StatusCodes.NOT_FOUND).send();
+    return;
+  }
+
+  res.json(details);
 });
 
 export default router;

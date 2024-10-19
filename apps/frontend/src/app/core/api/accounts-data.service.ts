@@ -11,7 +11,7 @@ export class AccountsDataService {
     return this.baseApiService.get<Array<Account>>(`accounts`);
   }
 
-  getAccountBalance(accountId: string): Observable<number | null> {
-    return this.baseApiService.get<number | null>(`accounts/${accountId}/balance`);
+  getAccountDetails(accountId: string): Observable<Account> {
+    return this.baseApiService.get<Account>(`accounts/${accountId}`);
   }
 }

@@ -40,9 +40,9 @@
         }
       }
     },
-    "/accounts/{id}/balance": {
+    "/accounts/{id}": {
       "get": {
-        "summary": "Get account balance",
+        "summary": "Get account details",
         "tags": ["Account"],
         "parameters": [
           {
@@ -54,17 +54,17 @@
         ],
         "responses": {
           "200": {
-            "description": "Account balance",
+            "description": "Account details",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "number",
-                  "description": "Account balance in cents. Null if account does not exist",
-                  "example": 12345,
-                  "nullable": true
+                  "$ref": "#/components/schemas/Account"
                 }
               }
             }
+          },
+          "404": {
+            "description": "Account not found"
           }
         }
       }
