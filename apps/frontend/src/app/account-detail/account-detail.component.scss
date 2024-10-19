@@ -1,0 +1,21 @@
+:host {
+  display: block;
+}
+
+table {
+  margin: 4em;
+  width: calc(100% - 8em);
+  border: 1px solid;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border: 1px solid #ccc;
+  padding: 0.5em;
+}
+
+h1,
+h3 {
+  text-align: center;
+}

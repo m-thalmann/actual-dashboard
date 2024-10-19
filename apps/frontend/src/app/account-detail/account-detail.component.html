@@ -1,0 +1,23 @@
+<div>
+  <h1>{{ accountDetails()?.name }}</h1>
+  <h3>{{ (accountDetails()?.amount ?? 0) / 100 | currency }}</h3>
+</div>
+
+<table>
+  <tr>
+    <th>date</th>
+    <th>payee</th>
+    <th>notes</th>
+    <th>category</th>
+    <th>amount</th>
+  </tr>
+  @for (transaction of transactions(); track transaction.id) {
+    <tr>
+      <td>{{ transaction.date | date }}</td>
+      <td>{{ transaction.payee }}</td>
+      <td>{{ transaction.notes }}</td>
+      <td>{{ transaction.category }}</td>
+      <td>{{ transaction.amount | currency }}</td>
+    </tr>
+  }
+</table>

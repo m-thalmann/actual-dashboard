@@ -1,4 +1,5 @@
 import { Route } from '@angular/router';
+import { AccountDetailComponent } from './account-detail/account-detail.component';
 import { AccountsOverviewComponent } from './accounts-overview/accounts-overview.component';
 
 export const appRoutes: Array<Route> = [
@@ -10,5 +11,9 @@ export const appRoutes: Array<Route> = [
   {
     path: 'accounts',
     component: AccountsOverviewComponent,
+  },
+  {
+    path: 'accounts/:accountId',
+    component: AccountDetailComponent,
   },
 ];
