@@ -21,3 +21,10 @@
     </tr>
   }
 </table>
+<div class="pagination">
+  @if (page() > 1) {
+    <a routerLink="." [queryParams]="{ page: page() - 1 }">←</a>
+  }
+  {{ page() }}
+  <a routerLink="." [queryParams]="{ page: page() + 1 }">→</a>
+</div>
