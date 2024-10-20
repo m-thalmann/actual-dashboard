@@ -29,10 +29,16 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Account"
-                  }
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Account"
+                      }
+                    }
+                  },
+                  "required": ["data"]
                 }
               }
             }
@@ -58,7 +64,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Account"
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Account"
+                    }
+                  },
+                  "required": ["data"]
                 }
               }
             }
@@ -100,10 +112,19 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Transaction"
-                  }
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Transaction"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMeta"
+                    }
+                  },
+                  "required": ["data", "meta"]
                 }
               }
             }
@@ -150,6 +171,17 @@
           "category": { "type": "string", "description": "Transaction category", "example": "Food", "nullable": true }
         },
         "required": ["id", "date", "amount", "notes", "payee", "category"]
+      },
+
+      "PaginationMeta": {
+        "type": "object",
+        "properties": {
+          "total": { "type": "integer", "minimum": 0, "description": "Total amount of items" },
+          "perPage": { "type": "integer", "minimum": 1, "description": "Items per page" },
+          "currentPage": { "type": "integer", "minimum": 1, "description": "Current page number" },
+          "lastPage": { "type": "integer", "minimum": 0, "description": "Last page number" }
+        },
+        "required": ["total", "perPage", "currentPage", "lastPage"]
       }
     }
   }

@@ -18,9 +18,14 @@ router.get('/accounts/:accountId/transactions', async (req: Request, res: Respon
   const limit = pageSize;
   const offset = (page - 1) * pageSize;
 
-  const transactions = await actualService.getTransactions(accountId, limit, offset);
+  const [transactions, totalAmount] = await Promise.all([
+    actualService.getTransactions(accountId, limit, offset),
+    actualService.getTransactionsCount(accountId),
+  ]);
 
-  res.json(transactions);
+  const lastPage = Math.ceil(totalAmount / pageSize);
+
+  res.json({ data: transactions, meta: { total: totalAmount, perPage: pageSize, currentPage: page, lastPage } });
 });
 
 export default router;

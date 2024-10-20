@@ -1,6 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { ApiResponseWithMeta } from '../models/api-response';
 import { PaginationConfig } from '../models/pagination-config';
+import { PaginationMeta } from '../models/pagination-meta';
 import { Transaction } from '../models/transaction';
 import { BaseApiService } from './base-api.service';
 
@@ -13,9 +15,11 @@ export class TransactionsDataService {
   getTransactions(
     accountId: string,
     { page, pageSize }: PaginationConfig = { page: 1 },
-  ): Observable<Array<Transaction>> {
-    return this.baseApiService.get<Array<Transaction>>(
-      `accounts/${accountId}/transactions?page=${page}&page-size=${pageSize ?? TransactionsDataService.DEFAULT_PAGE_SIZE}`,
+  ): Observable<ApiResponseWithMeta<Array<Transaction>, PaginationMeta>> {
+    const usedPageSize = pageSize ?? TransactionsDataService.DEFAULT_PAGE_SIZE;
+
+    return this.baseApiService.get<ApiResponseWithMeta<Array<Transaction>, PaginationMeta>>(
+      `accounts/${accountId}/transactions?page=${page}&page-size=${usedPageSize}`,
     );
   }
 }

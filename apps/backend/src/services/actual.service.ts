@@ -1,4 +1,5 @@
 import { downloadBudget, init, q, runQuery, shutdown, sync } from '@actual-app/api';
+import { Query } from '@actual-app/api/@types/loot-core/shared/query';
 import { Account, ActualConfig, Transaction } from './actual.models';
 
 export class ActualService {
@@ -36,20 +37,6 @@ export class ActualService {
     return queryData.data;
   }
 
-  // async getAccountBalance(accountId: string): Promise<number> {
-  //   if (!this.isAllowedAccount(accountId)) {
-  //     return 0;
-  //   }
-
-  //   const query = q('transactions')
-  //     .filter({ account: { $eq: accountId } })
-  //     .select([{ amount: { $sum: '$amount' } }]);
-
-  //   const queryData = (await runQuery(query)) as { data: [{ amount: number }] };
-
-  //   return queryData.data[0].amount;
-  // }
-
   async getAccountDetails(accountId: string): Promise<Account | null> {
     if (!this.isAllowedAccount(accountId)) {
       return null;
@@ -77,9 +64,19 @@ export class ActualService {
       .limit(limit)
       .offset(offset);
 
-    const queryData = (await runQuery(query)) as { data: Array<Transaction> };
+    return await this.runQuery<Array<Transaction>>(query);
+  }
 
-    return queryData.data;
+  async getTransactionsCount(accountId: string): Promise<number> {
+    if (!this.isAllowedAccount(accountId)) {
+      return 0;
+    }
+
+    const query = q('transactions')
+      .filter({ account: { $eq: accountId } })
+      .select([{ total: { $count: '*' } }]);
+
+    return (await this.runQuery<{ 0: { total: number } }>(query))[0].total;
   }
 
   async destroy(): Promise<void> {
@@ -88,5 +85,11 @@ export class ActualService {
 
   isAllowedAccount(accountId: string): boolean {
     return this.config.allowedAccounts === null || this.config.allowedAccounts.includes(accountId);
+  }
+
+  private async runQuery<T>(query: Query): Promise<T> {
+    const data = (await runQuery(query)) as { data: T };
+
+    return data.data;
   }
 }

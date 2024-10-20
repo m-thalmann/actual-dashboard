@@ -2,9 +2,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { AccountsDataService } from '../core/api/accounts-data.service';
+import { Account } from '../core/models/account';
 import { AccountsOverviewComponent } from './accounts-overview.component';
 
-const mockAccounts = [
+const mockAccounts: Array<Account> = [
   {
     id: '123e4567-e89b-12d3-a456-426614174000',
     name: 'Test Account',
@@ -25,7 +26,7 @@ describe('AccountsOverviewComponent', () => {
 
   beforeEach(async () => {
     mockAccountsDataService = {
-      getAccounts: jest.fn().mockReturnValue(of(mockAccounts)),
+      getAccounts: jest.fn().mockReturnValue(of({ data: mockAccounts })),
     };
 
     await TestBed.configureTestingModule({

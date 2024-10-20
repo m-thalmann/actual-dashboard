@@ -10,7 +10,7 @@ router.get('/accounts', async (req: Request, res: Response) => {
 
   const accounts = await actualService.getAccounts();
 
-  res.json(accounts);
+  res.json({ data: accounts });
 });
 
 router.get('/accounts/:accountId', async (req: Request, res: Response) => {
@@ -25,7 +25,7 @@ router.get('/accounts/:accountId', async (req: Request, res: Response) => {
     return;
   }
 
-  res.json(details);
+  res.json({ data: details });
 });
 
 export default router;

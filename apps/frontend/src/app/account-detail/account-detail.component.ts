@@ -1,11 +1,13 @@
 import { AsyncPipe, CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, Signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { combineLatest, filter, map, Observable, startWith, switchMap } from 'rxjs';
 import { AccountsDataService } from '../core/api/accounts-data.service';
 import { TransactionsDataService } from '../core/api/transactions-data.service';
 import { Account } from '../core/models/account';
+import { ApiResponseWithMeta } from '../core/models/api-response';
+import { PaginationMeta } from '../core/models/pagination-meta';
 import { Transaction } from '../core/models/transaction';
 
 @Component({
@@ -33,12 +35,25 @@ export class AccountDetailComponent {
 
   readonly page: Signal<number> = toSignal(this.page$, { requireSync: true });
 
-  // TODO: handle 404
+  readonly hasPagesLeft: Signal<boolean> = computed(() => {
+    const meta = this.transactions()?.meta;
+
+    if (meta === undefined) {
+      return true;
+    }
+
+    return meta.currentPage < meta.lastPage;
+  });
+
+  // TODO: handle 404 -> null
   readonly accountDetails: Signal<Account | undefined> = toSignal(
-    this.accountId$.pipe(switchMap((id) => this.accountsDataService.getAccountDetails(id))),
+    this.accountId$.pipe(
+      switchMap((id) => this.accountsDataService.getAccountDetails(id)),
+      map((account) => account.data ?? undefined),
+    ),
   );
 
-  readonly transactions: Signal<Array<Transaction> | undefined> = toSignal(
+  readonly transactions: Signal<ApiResponseWithMeta<Array<Transaction>, PaginationMeta> | undefined> = toSignal(
     combineLatest([this.accountId$, this.page$]).pipe(
       switchMap(([id, page]) => this.transactionsDataService.getTransactions(id, { page })),
     ),
