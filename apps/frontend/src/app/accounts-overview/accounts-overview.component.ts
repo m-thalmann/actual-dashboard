@@ -2,8 +2,8 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
-import { AccountsDataService } from '../core/api/accounts-data.service';
-import { Account } from '../core/models/account';
+import { AccountsDataService } from '../shared/api/accounts-data.service';
+import { Account } from '../shared/models/account';
 import { AccountCardComponent } from './account-card/account-card.component';
 
 @Component({

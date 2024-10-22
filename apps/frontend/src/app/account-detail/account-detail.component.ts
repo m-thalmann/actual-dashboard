@@ -3,12 +3,12 @@ import { ChangeDetectionStrategy, Component, computed, inject, Signal } from '@a
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { combineLatest, filter, map, Observable, startWith, switchMap } from 'rxjs';
-import { AccountsDataService } from '../core/api/accounts-data.service';
-import { TransactionsDataService } from '../core/api/transactions-data.service';
-import { Account } from '../core/models/account';
-import { ApiResponseWithMeta } from '../core/models/api-response';
-import { PaginationMeta } from '../core/models/pagination-meta';
-import { Transaction } from '../core/models/transaction';
+import { AccountsDataService } from '../shared/api/accounts-data.service';
+import { TransactionsDataService } from '../shared/api/transactions-data.service';
+import { Account } from '../shared/models/account';
+import { ApiResponseWithMeta } from '../shared/models/api-response';
+import { PaginationMeta } from '../shared/models/pagination-meta';
+import { Transaction } from '../shared/models/transaction';
 
 @Component({
   selector: 'app-account-detail',
@@ -35,16 +35,6 @@ export class AccountDetailComponent {
 
   readonly page: Signal<number> = toSignal(this.page$, { requireSync: true });
 
-  readonly hasPagesLeft: Signal<boolean> = computed(() => {
-    const meta = this.transactions()?.meta;
-
-    if (meta === undefined) {
-      return true;
-    }
-
-    return meta.currentPage < meta.lastPage;
-  });
-
   // TODO: handle 404 -> null
   readonly accountDetails: Signal<Account | undefined> = toSignal(
     this.accountId$.pipe(
@@ -58,4 +48,14 @@ export class AccountDetailComponent {
       switchMap(([id, page]) => this.transactionsDataService.getTransactions(id, { page })),
     ),
   );
+
+  readonly hasPagesLeft: Signal<boolean> = computed(() => {
+    const meta = this.transactions()?.meta;
+
+    if (meta === undefined) {
+      return true;
+    }
+
+    return meta.currentPage < meta.lastPage;
+  });
 }

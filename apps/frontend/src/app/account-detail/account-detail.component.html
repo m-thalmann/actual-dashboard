@@ -21,7 +21,7 @@
         <td>{{ transaction.payee }}</td>
         <td>{{ transaction.notes }}</td>
         <td>{{ transaction.category }}</td>
-        <td>{{ transaction.amount / 1000 | currency }}</td>
+        <td>{{ transaction.amount / 100 | currency }}</td>
       </tr>
     }
   </tbody>

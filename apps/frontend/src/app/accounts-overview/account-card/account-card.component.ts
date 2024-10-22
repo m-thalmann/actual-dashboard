@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input, InputSignal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { Account } from '../../core/models/account';
+import { Account } from '../../shared/models/account';
 
 @Component({
   selector: 'app-account-card',
