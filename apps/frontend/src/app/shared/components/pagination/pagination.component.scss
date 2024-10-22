@@ -1,0 +1,33 @@
+:host {
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  padding: 1em;
+
+  button {
+    background: var(--primary);
+    border: none;
+    border-radius: 0.25em;
+    cursor: pointer;
+
+    font-size: 1em;
+    width: 2em;
+    height: 2em;
+
+    transition: background 0.2s;
+
+    &:hover {
+      background: var(--primary-hover);
+    }
+
+    &:disabled {
+      background: rgba(0, 0, 0, 0.1);
+      cursor: default;
+    }
+  }
+}

@@ -1,10 +1,11 @@
 import { AsyncPipe, CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, Signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { combineLatest, filter, map, Observable, startWith, switchMap } from 'rxjs';
 import { AccountsDataService } from '../shared/api/accounts-data.service';
 import { TransactionsDataService } from '../shared/api/transactions-data.service';
+import { PaginationComponent } from '../shared/components/pagination/pagination.component';
 import { Account } from '../shared/models/account';
 import { ApiResponseWithMeta } from '../shared/models/api-response';
 import { PaginationMeta } from '../shared/models/pagination-meta';
@@ -13,12 +14,13 @@ import { Transaction } from '../shared/models/transaction';
 @Component({
   selector: 'app-account-detail',
   standalone: true,
-  imports: [CommonModule, AsyncPipe, RouterLink],
+  imports: [CommonModule, AsyncPipe, PaginationComponent],
   templateUrl: './account-detail.component.html',
   styleUrl: './account-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountDetailComponent {
+  private readonly router: Router = inject(Router);
   private readonly activatedRoute: ActivatedRoute = inject(ActivatedRoute);
   private readonly accountsDataService: AccountsDataService = inject(AccountsDataService);
   private readonly transactionsDataService: TransactionsDataService = inject(TransactionsDataService);
@@ -49,13 +51,7 @@ export class AccountDetailComponent {
     ),
   );
 
-  readonly hasPagesLeft: Signal<boolean> = computed(() => {
-    const meta = this.transactions()?.meta;
-
-    if (meta === undefined) {
-      return true;
-    }
-
-    return meta.currentPage < meta.lastPage;
-  });
+  updatePage(page: number): void {
+    this.router.navigate([], { queryParams: { page }, queryParamsHandling: 'merge' });
+  }
 }

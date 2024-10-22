@@ -1,4 +1,6 @@
-// dark mode
+@import '@fortawesome/fontawesome-free/scss/fontawesome';
+@import '@fortawesome/fontawesome-free/scss/solid';
+
 html,
 body {
   margin: 0;
@@ -16,4 +18,9 @@ html {
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+:root {
+  --primary: #83b729;
+  --primary-hover: #6f9e2e;
 }

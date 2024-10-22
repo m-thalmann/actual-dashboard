@@ -1,0 +1,7 @@
+<div class="container">
+  <button [disabled]="page() <= 1" (click)="prevPage.emit()"><i class="fa-solid fa-arrow-left"></i></button>
+
+  <span class="page">{{ page() }} of {{ totalPages() }}</span>
+
+  <button [disabled]="page() >= totalPages()" (click)="nextPage.emit()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
