@@ -1,5 +1,6 @@
 import { downloadBudget, init, q, runQuery, shutdown, sync } from '@actual-app/api';
 import { Query } from '@actual-app/api/@types/loot-core/shared/query';
+import { PaginationParams } from '../shared/pagination.utils';
 import { Account, ActualConfig, Transaction } from './actual.models';
 
 export class ActualService {
@@ -52,7 +53,7 @@ export class ActualService {
     return queryData.data[0] ?? null;
   }
 
-  async getTransactions(accountId: string, limit?: number, offset?: number): Promise<Array<Transaction>> {
+  async getTransactions(accountId: string, paginationParams?: PaginationParams): Promise<Array<Transaction>> {
     if (!this.isAllowedAccount(accountId)) {
       return [];
     }
@@ -61,8 +62,8 @@ export class ActualService {
     const query = q('transactions')
       .filter({ account: { $eq: accountId } })
       .select(['notes', 'amount', { payee: 'payee.name' }, 'date', { category: 'category.name' }])
-      .limit(limit)
-      .offset(offset);
+      .limit(paginationParams?.pageSize)
+      .offset(paginationParams?.offset);
 
     return await this.runQuery<Array<Transaction>>(query);
   }
