@@ -11,6 +11,7 @@ router.get('/accounts/:accountId/transactions', async (req: Request, res: Respon
   const accountId = req.params.accountId;
 
   const paginationParams = buildPaginationParams(req);
+  //const filterParams = buildFilterParams(req);
 
   const [transactions, totalAmount] = await Promise.all([
     actualService.getTransactions(accountId, paginationParams),
