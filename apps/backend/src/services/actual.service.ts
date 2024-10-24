@@ -1,5 +1,6 @@
 import { downloadBudget, init, q, runQuery, shutdown, sync } from '@actual-app/api';
 import { Query } from '@actual-app/api/@types/loot-core/shared/query';
+import { FilterParams } from '../shared/filter.utils';
 import { PaginationParams } from '../shared/pagination.utils';
 import { Account, ActualConfig, Transaction } from './actual.models';
 
@@ -53,31 +54,33 @@ export class ActualService {
     return queryData.data[0] ?? null;
   }
 
-  async getTransactions(accountId: string, paginationParams?: PaginationParams): Promise<Array<Transaction>> {
+  async getTransactions(
+    accountId: string,
+    options?: { pagination?: PaginationParams; filters?: Array<FilterParams> },
+  ): Promise<{ transactions: Array<Transaction>; totalAmount: number }> {
     if (!this.isAllowedAccount(accountId)) {
-      return [];
+      return { transactions: [], totalAmount: 0 };
     }
     // TODO: somehow include the running balance? (-> carryover)
 
-    const query = q('transactions')
-      .filter({ account: { $eq: accountId } })
+    const baseQuery = this.applyFilters(
+      q('transactions').filter({ account: { $eq: accountId } }),
+      options?.filters ?? [],
+    );
+
+    const query = baseQuery
       .select(['notes', 'amount', { payee: 'payee.name' }, 'date', { category: 'category.name' }])
-      .limit(paginationParams?.pageSize)
-      .offset(paginationParams?.offset);
+      .limit(options?.pagination?.pageSize)
+      .offset(options?.pagination?.offset);
 
-    return await this.runQuery<Array<Transaction>>(query);
-  }
+    const totalAmountQuery = baseQuery.select([{ total: { $count: '*' } }]);
 
-  async getTransactionsCount(accountId: string): Promise<number> {
-    if (!this.isAllowedAccount(accountId)) {
-      return 0;
-    }
+    const [transactions, totalAmount] = await Promise.all([
+      this.runQuery<Array<Transaction>>(query),
+      this.runQuery<{ 0: { total: number } }>(totalAmountQuery),
+    ]);
 
-    const query = q('transactions')
-      .filter({ account: { $eq: accountId } })
-      .select([{ total: { $count: '*' } }]);
-
-    return (await this.runQuery<{ 0: { total: number } }>(query))[0].total;
+    return { transactions, totalAmount: totalAmount[0].total };
   }
 
   async destroy(): Promise<void> {
@@ -92,5 +95,18 @@ export class ActualService {
     const data = (await runQuery(query)) as { data: T };
 
     return data.data;
+  }
+
+  private applyFilters(query: Query, filters: Array<FilterParams>): Query {
+    return filters.reduce((acc, filter) => {
+      switch (filter.type) {
+        case 'eq':
+          return acc.filter({ [filter.property]: { $eq: filter.value } });
+        case 'like':
+          return acc.filter({ [filter.property]: { $like: filter.value } });
+        default:
+          return acc;
+      }
+    }, query);
   }
 }
