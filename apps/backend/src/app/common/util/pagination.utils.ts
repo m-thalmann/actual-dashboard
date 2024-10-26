@@ -1,3 +1,4 @@
+import { PaginationMeta } from '@app/shared-types';
 import { Request } from 'express';
 
 export const DEFAULT_PAGE_SIZE = 20;
@@ -6,13 +7,6 @@ export interface PaginationParams {
   page: number;
   pageSize: number;
   offset: number;
-}
-
-export interface PaginationMeta {
-  total: number;
-  perPage: number;
-  currentPage: number;
-  lastPage: number;
 }
 
 export function calculateLastPage(totalAmount: number, pageSize: number): number {

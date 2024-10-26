@@ -1,18 +1,5 @@
+import { FILTER_TYPES, FilterParams, FilterType } from '@app/shared-types';
 import { Request } from 'express';
-import { ObjectValue } from './utils';
-
-export const FILTER_TYPES = {
-  EQ: 'eq',
-  LIKE: 'like',
-} as const;
-
-export type FilterType = ObjectValue<typeof FILTER_TYPES>;
-
-export interface FilterParams {
-  property: string;
-  type: FilterType;
-  value: string | null;
-}
 
 function isSimpleFilter(filter: unknown): filter is string {
   return typeof filter === 'string';

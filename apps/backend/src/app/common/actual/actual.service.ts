@@ -1,21 +1,55 @@
 import { downloadBudget, init, q, runQuery, shutdown, sync } from '@actual-app/api';
 import { Query } from '@actual-app/api/@types/loot-core/shared/query';
-import { FilterParams } from '../shared/filter.utils';
-import { PaginationParams } from '../shared/pagination.utils';
-import { Account, ActualConfig, Transaction } from './actual.models';
+import { FilterParams } from '@app/shared-types';
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import * as path from 'path';
+import { PaginationParams } from '../util/pagination.utils';
+import { Account, Transaction } from './actual.models';
 
+// TODO: document why this path is correct and maybe move some place else
+const DATA_DIR = path.resolve(__dirname, 'data');
+
+@Injectable()
 export class ActualService {
-  constructor(private readonly config: ActualConfig) {}
+  private readonly serverUrl: string;
+  private readonly password: string;
+  private readonly syncId: string;
+  private readonly filePassword: string | undefined;
+  private readonly allowedAccounts: Array<string> | null;
+
+  constructor(private readonly configService: ConfigService) {
+    const serverUrl = this.configService.get<string>('ACTUAL_SERVER_URL');
+    const password = this.configService.get<string>('ACTUAL_SERVER_PASSWORD');
+    const syncId = this.configService.get<string>('ACTUAL_SERVER_SYNC_ID');
+
+    if (serverUrl === undefined || password === undefined || syncId === undefined) {
+      throw new Error('Missing Actual Server required configuration');
+    }
+
+    this.serverUrl = serverUrl;
+    this.password = password;
+    this.syncId = syncId;
+    this.filePassword = this.configService.get<string>('ACTUAL_SERVER_FILE_PASSWORD');
+
+    const configAllowedAccounts = this.configService.get<string>('ACTUAL_SERVER_ALLOWED_ACCOUNTS');
+
+    if (configAllowedAccounts === '*' || configAllowedAccounts === undefined) {
+      this.allowedAccounts = null;
+    } else {
+      this.allowedAccounts = configAllowedAccounts.split(',');
+    }
+  }
 
   async init(): Promise<void> {
     await init({
-      serverURL: this.config.serverUrl,
-      password: this.config.password,
+      serverURL: this.serverUrl,
+      password: this.password,
 
-      dataDir: this.config.dataDir,
+      dataDir: DATA_DIR,
     });
 
-    await downloadBudget(this.config.syncId, { password: this.config.filePassword });
+    await downloadBudget(this.syncId, { password: this.filePassword });
   }
 
   async reload(): Promise<void> {
@@ -25,8 +59,8 @@ export class ActualService {
   async getAccounts(): Promise<Array<Account>> {
     const filter: Record<string, unknown> = {};
 
-    if (this.config.allowedAccounts !== null) {
-      filter.$or = this.config.allowedAccounts.map((account) => ({ account: { $eq: account } }));
+    if (this.allowedAccounts !== null) {
+      filter.$or = this.allowedAccounts.map((account) => ({ account: { $eq: account } }));
     }
 
     const query = q('transactions')
@@ -88,7 +122,7 @@ export class ActualService {
   }
 
   isAllowedAccount(accountId: string): boolean {
-    return this.config.allowedAccounts === null || this.config.allowedAccounts.includes(accountId);
+    return this.allowedAccounts === null || this.allowedAccounts.includes(accountId);
   }
 
   private async runQuery<T>(query: Query): Promise<T> {

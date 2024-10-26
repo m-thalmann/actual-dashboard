@@ -6,20 +6,18 @@
   "tags": [],
   "targets": {
     "serve": {
-      "executor": "nx:run-commands",
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
       "options": {
-        "commands": ["nodemon --watch ./src src/app.ts"],
-        "cwd": "{projectRoot}",
-        "parallel": false
-      }
-    },
-    "build": {
-      "executor": "@nx/js:tsc",
-      "options": {
-        "outputPath": "dist/backend",
-        "main": "{projectRoot}/src/app.ts",
-        "tsConfig": "{projectRoot}/tsconfig.app.json",
-        "assets": ["{projectRoot}/*.md", "{projectRoot}/data/.gitignore"]
+        "buildTarget": "backend:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "backend:build:development"
+        },
+        "production": {
+          "buildTarget": "backend:build:production"
+        }
       }
     }
   }

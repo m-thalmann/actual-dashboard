@@ -11,13 +11,6 @@
     }
   ],
   "compilerOptions": {
-    "useDefineForClassFields": false,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "noImplicitOverride": true,
-    "noImplicitReturns": true,
-    "noImplicitAny": true,
-    "noFallthroughCasesInSwitch": true
+    "esModuleInterop": true
   }
 }
