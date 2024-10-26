@@ -6,7 +6,7 @@
 <div class="container">
   <div class="actions">
     <div class="filters">
-      <input type="text" placeholder="Search notes ..." #searchInput (keyup.enter)="search(searchInput.value)" />
+      <app-input-field [value]="search()" label="Search" (valueChange)="doSearch($event)" clearable />
     </div>
 
     <app-pagination

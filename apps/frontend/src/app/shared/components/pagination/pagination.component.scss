@@ -1,13 +1,7 @@
 :host {
   display: flex;
-  justify-content: center;
-}
-
-.container {
-  display: flex;
   align-items: center;
   gap: 1em;
-  padding: 1em;
 
   button {
     background: var(--primary);

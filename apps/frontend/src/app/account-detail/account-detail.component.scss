@@ -2,26 +2,9 @@
   display: block;
 }
 
-table {
-  width: 100%;
-  border: 1px solid;
-  border-collapse: collapse;
-}
-
-th,
-td {
-  border: 1px solid #ccc;
-  padding: 0.5em;
-}
-
 h1,
 h3 {
   text-align: center;
-}
-
-.actions {
-  display: flex;
-  justify-content: space-between;
 }
 
 .container {
@@ -32,4 +15,22 @@ h3 {
   margin: 0 auto;
   padding: 0 2em;
   max-width: 1800px;
+
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+  }
+
+  table {
+    width: 100%;
+    border: 1px solid;
+    border-collapse: collapse;
+
+    th,
+    td {
+      border: 1px solid #ccc;
+      padding: 0.5em;
+    }
+  }
 }

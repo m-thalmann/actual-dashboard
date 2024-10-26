@@ -3,9 +3,20 @@ import { ChangeDetectionStrategy, Component, inject, Signal } from '@angular/cor
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FILTER_TYPES, FilterParams } from '@app/shared-types';
-import { combineLatest, filter, map, Observable, shareReplay, startWith, switchMap } from 'rxjs';
+import {
+  combineLatest,
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  map,
+  Observable,
+  shareReplay,
+  startWith,
+  switchMap,
+} from 'rxjs';
 import { AccountsDataService } from '../shared/api/accounts-data.service';
 import { TransactionsDataService } from '../shared/api/transactions-data.service';
+import { InputFieldComponent } from '../shared/components/input-field/input-field.component';
 import { PaginationComponent } from '../shared/components/pagination/pagination.component';
 import { Account } from '../shared/models/account';
 import { ApiResponseWithMeta } from '../shared/models/api-response';
@@ -15,7 +26,7 @@ import { Transaction } from '../shared/models/transaction';
 @Component({
   selector: 'app-account-detail',
   standalone: true,
-  imports: [CommonModule, AsyncPipe, PaginationComponent],
+  imports: [CommonModule, AsyncPipe, PaginationComponent, InputFieldComponent],
   templateUrl: './account-detail.component.html',
   styleUrl: './account-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -56,13 +67,20 @@ export class AccountDetailComponent {
 
       return filters.length === 0 ? undefined : filters;
     }),
-    startWith(undefined),
+    distinctUntilChanged(),
     shareReplay({
       refCount: true,
     }),
   );
 
   readonly page: Signal<number> = toSignal(this.page$, { requireSync: true });
+  readonly search: Signal<string> = toSignal(
+    this.filters$.pipe(
+      map((filters) => filters?.find((foundFilter) => foundFilter.property === 'notes')?.value ?? ''),
+      startWith(''),
+    ),
+    { requireSync: true },
+  );
 
   // TODO: handle 404 -> null
   readonly accountDetails: Signal<Account | undefined> = toSignal(
@@ -74,6 +92,7 @@ export class AccountDetailComponent {
 
   readonly transactions: Signal<ApiResponseWithMeta<Array<Transaction>, PaginationMeta> | undefined> = toSignal(
     combineLatest([this.accountId$, this.page$, this.filters$]).pipe(
+      debounceTime(1), // prevent multiple requests when changing filters and page at the same time
       switchMap(([id, page, filters]) =>
         this.transactionsDataService.getTransactions(id, {
           pagination: { page },
@@ -87,7 +106,7 @@ export class AccountDetailComponent {
     this.applyFilterParams({ page: page.toString() });
   }
 
-  search(value: string): void {
+  doSearch(value: string): void {
     const searchValue = value === '' ? null : value;
     this.applyFilterParams({ search: searchValue });
   }

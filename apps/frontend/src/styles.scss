@@ -1,6 +1,16 @@
 @import '@fortawesome/fontawesome-free/scss/fontawesome';
 @import '@fortawesome/fontawesome-free/scss/solid';
 
+:root {
+  --primary: #83b729;
+  --primary-hover: #6f9e2e;
+
+  --foreground: white;
+  --background: #2f2f2f;
+
+  --transition-duration: 0.2s;
+}
+
 html,
 body {
   margin: 0;
@@ -10,17 +20,12 @@ body {
 
 html {
   font-family: 'Nunito', sans-serif;
-  color: white;
-  background: #2f2f2f;
+  color: var(--foreground);
+  background: var(--background);
 }
 
 *,
 *::before,
 *::after {
   box-sizing: border-box;
-}
-
-:root {
-  --primary: #83b729;
-  --primary-hover: #6f9e2e;
 }
