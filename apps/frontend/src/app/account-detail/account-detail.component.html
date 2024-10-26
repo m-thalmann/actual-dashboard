@@ -3,43 +3,51 @@
   <h3>{{ (accountDetails()?.amount ?? 0) / 100 | currency }}</h3>
 </div>
 
-<app-pagination
-  [page]="page()"
-  [totalPages]="transactions()?.meta?.lastPage ?? 0"
-  (prevPage)="updatePage(page() - 1)"
-  (nextPage)="updatePage(page() + 1)"
-/>
+<div class="container">
+  <div class="actions">
+    <div class="filters">
+      <input type="text" placeholder="Search notes ..." #searchInput (keyup.enter)="search(searchInput.value)" />
+    </div>
 
-<table>
-  <thead>
-    <tr>
-      <th>Date</th>
-      <th>Payee</th>
-      <th>Notes</th>
-      <th>Category</th>
-      <th>Payment</th>
-      <th>Deposit</th>
-    </tr>
-  </thead>
+    <app-pagination
+      [page]="page()"
+      [totalPages]="transactions()?.meta?.lastPage ?? 0"
+      (prevPage)="updatePage(page() - 1)"
+      (nextPage)="updatePage(page() + 1)"
+    />
+  </div>
 
-  <tbody>
-    @for (transaction of transactions()?.data; track transaction.id) {
+  <table>
+    <thead>
       <tr>
-        <td>{{ transaction.date | date }}</td>
-        <td>{{ transaction.payee }}</td>
-        <td>{{ transaction.notes }}</td>
-        <td>{{ transaction.category }}</td>
-        <td>
-          @if (transaction.amount < 0) {
-            {{ transaction.amount / 100 | currency }}
-          }
-        </td>
-        <td>
-          @if (transaction.amount > 0) {
-            {{ transaction.amount / 100 | currency }}
-          }
-        </td>
+        <th>Date</th>
+        <th>Payee</th>
+        <th>Notes</th>
+        <th>Category</th>
+        <th>Payment</th>
+        <th>Deposit</th>
       </tr>
-    }
-  </tbody>
-</table>
+    </thead>
+
+    <tbody>
+      @for (transaction of transactions()?.data; track transaction.id) {
+        <tr>
+          <td>{{ transaction.date | date }}</td>
+          <td>{{ transaction.payee }}</td>
+          <td>{{ transaction.notes }}</td>
+          <td>{{ transaction.category }}</td>
+          <td>
+            @if (transaction.amount < 0) {
+              {{ transaction.amount / 100 | currency }}
+            }
+          </td>
+          <td>
+            @if (transaction.amount > 0) {
+              {{ transaction.amount / 100 | currency }}
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

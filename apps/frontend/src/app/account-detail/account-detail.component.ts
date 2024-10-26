@@ -2,7 +2,8 @@ import { AsyncPipe, CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { combineLatest, filter, map, Observable, startWith, switchMap } from 'rxjs';
+import { FILTER_TYPES, FilterParams } from '@app/shared-types';
+import { combineLatest, filter, map, Observable, shareReplay, startWith, switchMap } from 'rxjs';
 import { AccountsDataService } from '../shared/api/accounts-data.service';
 import { TransactionsDataService } from '../shared/api/transactions-data.service';
 import { PaginationComponent } from '../shared/components/pagination/pagination.component';
@@ -25,14 +26,40 @@ export class AccountDetailComponent {
   private readonly accountsDataService: AccountsDataService = inject(AccountsDataService);
   private readonly transactionsDataService: TransactionsDataService = inject(TransactionsDataService);
 
+  categories: Array<string> = ['category', 'notes', 'date'];
+
   readonly accountId$: Observable<string> = this.activatedRoute.paramMap.pipe(
     map((params) => params.get('accountId')),
     filter((id) => id !== null),
+    shareReplay({
+      refCount: true,
+    }),
   );
 
   readonly page$: Observable<number> = this.activatedRoute.queryParamMap.pipe(
     map((params) => parseInt(params.get('page') ?? '1')),
     startWith(1),
+    shareReplay({
+      refCount: true,
+    }),
+  );
+
+  readonly filters$: Observable<Array<FilterParams> | undefined> = this.activatedRoute.queryParamMap.pipe(
+    map((params) => {
+      const filters = [];
+
+      const search = params.get('search');
+
+      if (search !== null) {
+        filters.push({ property: 'notes', type: FILTER_TYPES.LIKE, value: search });
+      }
+
+      return filters.length === 0 ? undefined : filters;
+    }),
+    startWith(undefined),
+    shareReplay({
+      refCount: true,
+    }),
   );
 
   readonly page: Signal<number> = toSignal(this.page$, { requireSync: true });
@@ -46,12 +73,31 @@ export class AccountDetailComponent {
   );
 
   readonly transactions: Signal<ApiResponseWithMeta<Array<Transaction>, PaginationMeta> | undefined> = toSignal(
-    combineLatest([this.accountId$, this.page$]).pipe(
-      switchMap(([id, page]) => this.transactionsDataService.getTransactions(id, { page })),
+    combineLatest([this.accountId$, this.page$, this.filters$]).pipe(
+      switchMap(([id, page, filters]) =>
+        this.transactionsDataService.getTransactions(id, {
+          pagination: { page },
+          filters,
+        }),
+      ),
     ),
   );
 
   updatePage(page: number): void {
-    this.router.navigate([], { queryParams: { page }, queryParamsHandling: 'merge' });
+    this.applyFilterParams({ page: page.toString() });
+  }
+
+  search(value: string): void {
+    const searchValue = value === '' ? null : value;
+    this.applyFilterParams({ search: searchValue });
+  }
+
+  private applyFilterParams(params: Record<string, string | null>, resetPage: boolean = true): void {
+    if (resetPage && !('page' in params)) {
+      // eslint-disable-next-line @typescript-eslint/dot-notation
+      params['page'] = null;
+    }
+
+    this.router.navigate([], { queryParams: params, queryParamsHandling: 'merge' });
   }
 }
