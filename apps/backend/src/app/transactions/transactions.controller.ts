@@ -6,7 +6,7 @@ import { Transaction } from '../common/actual/actual.models';
 import { ActualService } from '../common/actual/actual.service';
 import { buildFilterParams } from '../common/util/filter.utils';
 import { buildPaginationMeta, buildPaginationParams } from '../common/util/pagination.utils';
-import { getResponseSchema } from '../common/util/swagger.utils';
+import { ApiFilterQueryParams, ApiPaginationQueryParams, getResponseSchema } from '../common/util/swagger.utils';
 import { TransactionDto } from './dto/transaction.dto';
 
 @Controller('accounts/:id/transactions')
@@ -21,6 +21,8 @@ export class TransactionsController {
     schema: getResponseSchema(TransactionDto, { isArray: true, hasPagination: true }),
   })
   @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiPaginationQueryParams()
+  @ApiFilterQueryParams()
   async findAll(
     @Param('id') accountId: string,
     @Req() request: Request,
