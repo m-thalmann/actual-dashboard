@@ -1,0 +1,41 @@
+:host {
+  display: block;
+}
+
+table {
+  width: 100%;
+  border: none;
+  border-collapse: collapse;
+  border-radius: 0.25em;
+
+  background: rgba(255, 255, 255, 0.1);
+
+  th,
+  td {
+    padding: 0.5em;
+
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+
+    &.right {
+      text-align: right;
+    }
+
+    &:first-of-type {
+      padding-left: 1em;
+    }
+    &:last-of-type {
+      padding-right: 1em;
+    }
+  }
+
+  th {
+    text-align: left;
+    opacity: 0.5;
+  }
+
+  tbody tr {
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
+}

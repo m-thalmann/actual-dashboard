@@ -22,11 +22,12 @@ import { Account } from '../shared/models/account';
 import { ApiResponseWithMeta } from '../shared/models/api-response';
 import { PaginationMeta } from '../shared/models/pagination-meta';
 import { Transaction } from '../shared/models/transaction';
+import { TransactionsTableComponent } from './transactions-table/transactions-table.component';
 
 @Component({
   selector: 'app-account-detail',
   standalone: true,
-  imports: [CommonModule, AsyncPipe, PaginationComponent, InputFieldComponent],
+  imports: [CommonModule, AsyncPipe, PaginationComponent, InputFieldComponent, TransactionsTableComponent],
   templateUrl: './account-detail.component.html',
   styleUrl: './account-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
