@@ -21,7 +21,7 @@ export class BaseApiService {
     });
   }
 
-  private generateFilterParams(filters?: Array<FilterParams>): HttpParams | null {
+  protected generateFilterParams(filters?: Array<FilterParams>): HttpParams | null {
     if (!filters || filters.length === 0) {
       return null;
     }
@@ -34,7 +34,7 @@ export class BaseApiService {
     }, new HttpParams());
   }
 
-  private generatePaginationParams(pagination?: PaginationConfig): HttpParams | null {
+  protected generatePaginationParams(pagination?: PaginationConfig): HttpParams | null {
     if (pagination === undefined) {
       return null;
     }
@@ -45,7 +45,7 @@ export class BaseApiService {
     return new HttpParams().append('page', page).append('page-size', pageSize);
   }
 
-  private mergeParams(...httpParams: Array<HttpParams | null>): HttpParams | undefined {
+  protected mergeParams(...httpParams: Array<HttpParams | null>): HttpParams | undefined {
     const mergedParams: Record<string, Array<string>> = {};
 
     for (const params of httpParams) {

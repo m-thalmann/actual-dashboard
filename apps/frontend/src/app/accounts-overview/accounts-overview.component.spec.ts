@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
-import { AccountsDataService } from '../core/api/accounts-data.service';
-import { Account } from '../core/models/account';
+import { AccountsDataService } from '../shared/api/accounts-data.service';
+import { Account } from '../shared/models/account';
 import { AccountsOverviewComponent } from './accounts-overview.component';
 
 const mockAccounts: Array<Account> = [

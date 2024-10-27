@@ -12,6 +12,9 @@ describe('TransactionsTableComponent', () => {
 
     fixture = TestBed.createComponent(TransactionsTableComponent);
     component = fixture.componentInstance;
+
+    fixture.componentRef.setInput('transactions', []);
+
     fixture.detectChanges();
   });
 
