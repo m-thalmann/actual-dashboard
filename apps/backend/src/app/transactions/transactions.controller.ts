@@ -40,4 +40,16 @@ export class TransactionsController {
       meta: buildPaginationMeta(paginationParams, totalAmount),
     };
   }
+
+  @Get('categories')
+  @ApiOperation({ summary: 'Get account transactions categories' })
+  @ApiOkResponse({
+    schema: getResponseSchema('string', { isArray: true }),
+  })
+  @ApiParam({ name: 'id', format: 'uuid' })
+  async findAllCategories(@Param('id') accountId: string): Promise<{ data: Array<string> }> {
+    const categories = await this.actualService.getCategories(accountId);
+
+    return { data: categories };
+  }
 }

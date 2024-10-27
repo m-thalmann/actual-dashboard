@@ -11,7 +11,15 @@ module.exports = {
       compiler: 'tsc',
       main: './src/main.ts',
       tsConfig: './tsconfig.app.json',
-      assets: ['./src/assets', './src/.env', './src/data'],
+      assets: [
+        './src/assets',
+        './src/data',
+        {
+          input: './src',
+          glob: '*.env',
+          output: '.',
+        },
+      ],
       optimization: false,
       outputHashing: 'none',
     }),

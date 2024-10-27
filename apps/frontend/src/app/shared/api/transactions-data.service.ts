@@ -20,4 +20,8 @@ export class TransactionsDataService {
       options,
     );
   }
+
+  getCategories(accountId: string): Observable<Array<string>> {
+    return this.baseApiService.get<Array<string>>(`accounts/${accountId}/transactions/categories`);
+  }
 }

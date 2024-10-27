@@ -117,6 +117,21 @@ export class ActualService {
     return { transactions, totalAmount: totalAmount[0].total };
   }
 
+  async getCategories(accountId: string): Promise<Array<string>> {
+    if (!this.isAllowedAccount(accountId)) {
+      return [];
+    }
+
+    const query = q('transactions')
+      .filter({ account: { $eq: accountId } })
+      .groupBy('category')
+      .select([{ name: 'category.name' }]);
+
+    const queryData = (await runQuery(query)) as { data: Array<{ name: string | null }> };
+
+    return queryData.data.map((category) => category.name).filter((category) => category !== null);
+  }
+
   async destroy(): Promise<void> {
     await shutdown();
   }

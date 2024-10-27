@@ -8,9 +8,9 @@ export function getResponseSchema(
   dto: Function | string,
   options?: { isArray?: boolean; hasPagination?: boolean },
 ): SchemaObject {
-  const dataSchema = options?.isArray
-    ? { type: 'array', items: { $ref: getSchemaPath(dto) } }
-    : { $ref: getSchemaPath(dto) };
+  const schema = typeof dto === 'string' ? { type: dto } : { $ref: getSchemaPath(dto) };
+
+  const dataSchema = options?.isArray ? { type: 'array', items: schema } : schema;
 
   const properties: SchemaObject['properties'] = {
     data: dataSchema,
