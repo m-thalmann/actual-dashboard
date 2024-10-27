@@ -6,9 +6,17 @@ import { PaginationMetaDto } from '../dto/pagination-meta.dto';
 export function getResponseSchema(
   // eslint-disable-next-line @typescript-eslint/ban-types
   dto: Function | string,
-  options?: { isArray?: boolean; hasPagination?: boolean },
+  options?: { isArray?: boolean; hasPagination?: boolean; nullable?: boolean },
 ): SchemaObject {
-  const schema = typeof dto === 'string' ? { type: dto } : { $ref: getSchemaPath(dto) };
+  let schema = undefined;
+
+  if (typeof dto === 'string') {
+    schema = { type: dto, nullable: options?.nullable };
+  } else if (options?.nullable) {
+    schema = { nullable: true, allOf: [{ $ref: getSchemaPath(dto) }] };
+  } else {
+    schema = { $ref: getSchemaPath(dto) };
+  }
 
   const dataSchema = options?.isArray ? { type: 'array', items: schema } : schema;
 

@@ -7,6 +7,12 @@
   <div class="actions">
     <div class="filters">
       <app-input-field [value]="search()" label="Search" (valueChange)="doSearch($event)" clearable />
+      <select #categorySelect (input)="changeCategory(categorySelect.value)">
+        <option value="">All</option>
+        @for (category of categories(); track category) {
+          <option [value]="category ?? nullString">{{ category ?? 'No category' }}</option>
+        }
+      </select>
     </div>
 
     <app-pagination

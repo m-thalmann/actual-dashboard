@@ -117,7 +117,7 @@ export class ActualService {
     return { transactions, totalAmount: totalAmount[0].total };
   }
 
-  async getCategories(accountId: string): Promise<Array<string>> {
+  async getCategories(accountId: string): Promise<Array<string | null>> {
     if (!this.isAllowedAccount(accountId)) {
       return [];
     }
@@ -129,7 +129,7 @@ export class ActualService {
 
     const queryData = (await runQuery(query)) as { data: Array<{ name: string | null }> };
 
-    return queryData.data.map((category) => category.name).filter((category) => category !== null);
+    return queryData.data.map((category) => category.name);
   }
 
   async destroy(): Promise<void> {

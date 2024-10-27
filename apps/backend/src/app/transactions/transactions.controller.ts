@@ -44,10 +44,10 @@ export class TransactionsController {
   @Get('categories')
   @ApiOperation({ summary: 'Get account transactions categories' })
   @ApiOkResponse({
-    schema: getResponseSchema('string', { isArray: true }),
+    schema: getResponseSchema('string', { isArray: true, nullable: true }),
   })
   @ApiParam({ name: 'id', format: 'uuid' })
-  async findAllCategories(@Param('id') accountId: string): Promise<{ data: Array<string> }> {
+  async findAllCategories(@Param('id') accountId: string): Promise<{ data: Array<string | null> }> {
     const categories = await this.actualService.getCategories(accountId);
 
     return { data: categories };

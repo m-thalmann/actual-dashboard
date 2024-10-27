@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { FilterParams } from '@app/shared-types';
 import { Observable } from 'rxjs';
-import { ApiResponseWithMeta } from '../models/api-response';
+import { ApiResponse, ApiResponseWithMeta } from '../models/api-response';
 import { PaginationConfig } from '../models/pagination-config';
 import { PaginationMeta } from '../models/pagination-meta';
 import { Transaction } from '../models/transaction';
@@ -21,7 +21,7 @@ export class TransactionsDataService {
     );
   }
 
-  getCategories(accountId: string): Observable<Array<string>> {
-    return this.baseApiService.get<Array<string>>(`accounts/${accountId}/transactions/categories`);
+  getCategories(accountId: string): Observable<ApiResponse<Array<string | null>>> {
+    return this.baseApiService.get<ApiResponse<Array<string | null>>>(`accounts/${accountId}/transactions/categories`);
   }
 }

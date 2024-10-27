@@ -1,7 +1,7 @@
 import { ObjectValue } from './util';
 
 export const FILTER_TYPES = {
-  EQ: 'eq',
+  EQUAL: 'eq',
   LIKE: 'like',
 } as const;
 

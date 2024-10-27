@@ -1,6 +1,7 @@
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FILTER_TYPES, FilterParams } from '@app/shared-types';
 import {
@@ -27,7 +28,7 @@ import { TransactionsTableComponent } from './transactions-table/transactions-ta
 @Component({
   selector: 'app-account-detail',
   standalone: true,
-  imports: [CommonModule, AsyncPipe, PaginationComponent, InputFieldComponent, TransactionsTableComponent],
+  imports: [CommonModule, AsyncPipe, PaginationComponent, InputFieldComponent, TransactionsTableComponent, FormsModule],
   templateUrl: './account-detail.component.html',
   styleUrl: './account-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -38,14 +39,30 @@ export class AccountDetailComponent {
   private readonly accountsDataService: AccountsDataService = inject(AccountsDataService);
   private readonly transactionsDataService: TransactionsDataService = inject(TransactionsDataService);
 
-  categories: Array<string> = ['category', 'notes', 'date'];
+  readonly nullString: string = '__NULL__';
 
   readonly accountId$: Observable<string> = this.activatedRoute.paramMap.pipe(
     map((params) => params.get('accountId')),
     filter((id) => id !== null),
+    distinctUntilChanged(),
     shareReplay({
       refCount: true,
     }),
+  );
+
+  // TODO: handle 404 -> null
+  readonly accountDetails: Signal<Account | undefined> = toSignal(
+    this.accountId$.pipe(
+      switchMap((id) => this.accountsDataService.getAccountDetails(id)),
+      map((account) => account.data ?? undefined),
+    ),
+  );
+
+  categories: Signal<Array<string | null> | undefined> = toSignal(
+    this.accountId$.pipe(
+      switchMap((id) => this.transactionsDataService.getCategories(id)),
+      map((loadedCategories) => loadedCategories.data),
+    ),
   );
 
   readonly page$: Observable<number> = this.activatedRoute.queryParamMap.pipe(
@@ -61,9 +78,14 @@ export class AccountDetailComponent {
       const filters = [];
 
       const search = params.get('search');
+      const category = params.get('category');
 
       if (search !== null) {
         filters.push({ property: 'notes', type: FILTER_TYPES.LIKE, value: search });
+      }
+
+      if (category !== null) {
+        filters.push({ property: 'category', type: FILTER_TYPES.EQUAL, value: category });
       }
 
       return filters.length === 0 ? undefined : filters;
@@ -81,14 +103,6 @@ export class AccountDetailComponent {
       startWith(''),
     ),
     { requireSync: true },
-  );
-
-  // TODO: handle 404 -> null
-  readonly accountDetails: Signal<Account | undefined> = toSignal(
-    this.accountId$.pipe(
-      switchMap((id) => this.accountsDataService.getAccountDetails(id)),
-      map((account) => account.data ?? undefined),
-    ),
   );
 
   readonly transactions: Signal<ApiResponseWithMeta<Array<Transaction>, PaginationMeta> | undefined> = toSignal(
@@ -110,6 +124,18 @@ export class AccountDetailComponent {
   doSearch(value: string): void {
     const searchValue = value === '' ? null : value;
     this.applyFilterParams({ search: searchValue });
+  }
+
+  changeCategory(category: string): void {
+    let filteredCategory: string | null = category;
+
+    if (category.length === 0) {
+      filteredCategory = null;
+    } else if (category === this.nullString) {
+      filteredCategory = '';
+    }
+
+    this.applyFilterParams({ category: filteredCategory });
   }
 
   private applyFilterParams(params: Record<string, string | null>, resetPage: boolean = true): void {
