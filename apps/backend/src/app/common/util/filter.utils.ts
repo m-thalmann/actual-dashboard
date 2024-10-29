@@ -1,11 +1,11 @@
 import { FILTER_TYPES, FilterParams, FilterType } from '@app/shared-types';
 import { Request } from 'express';
 
-function isSimpleFilter(filter: unknown): filter is string {
+export function isSimpleFilter(filter: unknown): filter is string {
   return typeof filter === 'string';
 }
 
-function isComplexFilter<T extends FilterType>(filter: unknown): filter is { [key in T]: string } {
+export function isComplexFilter<T extends FilterType>(filter: unknown): filter is { [key in T]: string } {
   if (filter === null || typeof filter !== 'object') {
     return false;
   }
@@ -60,7 +60,7 @@ export function buildFilterParams(
 
         return {
           property: filterProperty,
-          type: FILTER_TYPES.EQ,
+          type: FILTER_TYPES.EQUAL,
           value: filterValue,
         };
       }
