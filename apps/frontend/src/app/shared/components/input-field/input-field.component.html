@@ -1,19 +1,22 @@
 <label [class.disabled]="disabled()" [class.has-value]="value().length > 0" [class.clearable]="clearable()">
-  <input
-    [type]="type()"
-    [value]="value()"
-    (change)="value.set(inputElement.value)"
-    [disabled]="disabled()"
-    #inputElement
-  />
-
   <span class="label-text">
     {{ label() }}
   </span>
 
-  @if (clearable()) {
-    <button class="clear-button" [disabled]="disabled()" (click)="value.set('')">
-      <i class="fa-solid fa-xmark"></i>
-    </button>
-  }
+  <div class="input-container">
+    <input
+      [type]="type()"
+      [value]="value()"
+      [placeholder]="placeholder()"
+      (change)="value.set(inputElement.value)"
+      [disabled]="disabled()"
+      #inputElement
+    />
+
+    @if (clearable()) {
+      <button class="clear-button" [disabled]="disabled()" (click)="value.set('')">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    }
+  </div>
 </label>

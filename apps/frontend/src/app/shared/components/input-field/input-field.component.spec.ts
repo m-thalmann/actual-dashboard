@@ -25,4 +25,19 @@ describe('InputFieldComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should not show clear button', () => {
+    const clearButton = (fixture.nativeElement as HTMLElement).querySelector('button.clear-button');
+
+    expect(clearButton).toBeNull();
+  });
+
+  it('should show clear button', () => {
+    fixture.componentRef.setInput('clearable', true);
+    fixture.detectChanges();
+
+    const clearButton = (fixture.nativeElement as HTMLElement).querySelector('button.clear-button');
+
+    expect(clearButton).toBeDefined();
+  });
 });

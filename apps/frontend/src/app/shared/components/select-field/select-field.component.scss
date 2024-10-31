@@ -1,0 +1,40 @@
+:host {
+  display: block;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25em;
+  position: relative;
+
+  transition: opacity var(--transition-duration);
+
+  .label-text {
+    font-size: 0.85em;
+    padding-left: 0.25em;
+  }
+
+  select {
+    padding: 0.5em;
+    border: none;
+    border-radius: 0.25em;
+    outline: none;
+
+    background: var(--background-accent-1);
+    color: var(--foreground);
+
+    transition: background var(--transition-duration);
+
+    &:not(:disabled) {
+      &:focus,
+      &:hover {
+        background: var(--background-accent-2);
+      }
+    }
+  }
+
+  &.disabled {
+    opacity: 0.5;
+  }
+}

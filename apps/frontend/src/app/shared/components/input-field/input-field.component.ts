@@ -22,6 +22,7 @@ export class InputFieldComponent {
   readonly value: ModelSignal<string> = model.required<string>();
   readonly type: InputSignal<string> = input('text');
   readonly label: InputSignal<string> = input.required();
+  readonly placeholder: InputSignal<string> = input('');
 
   readonly clearable: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
   readonly disabled: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });

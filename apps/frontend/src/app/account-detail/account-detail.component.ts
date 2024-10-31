@@ -1,7 +1,6 @@
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FILTER_TYPES, FilterParams } from '@app/shared-types';
 import {
@@ -19,6 +18,7 @@ import { AccountsDataService } from '../shared/api/accounts-data.service';
 import { TransactionsDataService } from '../shared/api/transactions-data.service';
 import { InputFieldComponent } from '../shared/components/input-field/input-field.component';
 import { PaginationComponent } from '../shared/components/pagination/pagination.component';
+import { SelectFieldComponent, SelectFieldOption } from '../shared/components/select-field/select-field.component';
 import { Account } from '../shared/models/account';
 import { ApiResponseWithMeta } from '../shared/models/api-response';
 import { PaginationMeta } from '../shared/models/pagination-meta';
@@ -28,7 +28,14 @@ import { TransactionsTableComponent } from './transactions-table/transactions-ta
 @Component({
   selector: 'app-account-detail',
   standalone: true,
-  imports: [CommonModule, AsyncPipe, PaginationComponent, InputFieldComponent, TransactionsTableComponent, FormsModule],
+  imports: [
+    CommonModule,
+    AsyncPipe,
+    PaginationComponent,
+    InputFieldComponent,
+    SelectFieldComponent,
+    TransactionsTableComponent,
+  ],
   templateUrl: './account-detail.component.html',
   styleUrl: './account-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -38,8 +45,6 @@ export class AccountDetailComponent {
   private readonly activatedRoute: ActivatedRoute = inject(ActivatedRoute);
   private readonly accountsDataService: AccountsDataService = inject(AccountsDataService);
   private readonly transactionsDataService: TransactionsDataService = inject(TransactionsDataService);
-
-  readonly nullString: string = '__NULL__';
 
   readonly accountId$: Observable<string> = this.activatedRoute.paramMap.pipe(
     map((params) => params.get('accountId')),
@@ -58,11 +63,22 @@ export class AccountDetailComponent {
     ),
   );
 
-  categories: Signal<Array<string | null> | undefined> = toSignal(
+  readonly categoryOptions: Signal<Array<SelectFieldOption<string | null | undefined>>> = toSignal(
     this.accountId$.pipe(
       switchMap((id) => this.transactionsDataService.getCategories(id)),
       map((loadedCategories) => loadedCategories.data),
+      map((categories) => {
+        const options = categories.map<SelectFieldOption<string | null | undefined>>((category) => ({
+          value: category,
+          label: category ?? 'No category',
+        }));
+
+        options.unshift({ value: undefined, label: 'All' });
+
+        return options;
+      }),
     ),
+    { initialValue: [] },
   );
 
   readonly page$: Observable<number> = this.activatedRoute.queryParamMap.pipe(
@@ -97,10 +113,20 @@ export class AccountDetailComponent {
   );
 
   readonly page: Signal<number> = toSignal(this.page$, { requireSync: true });
-  readonly search: Signal<string> = toSignal(
+
+  readonly filters: Signal<{ search: string; category: string | null | undefined }> = toSignal(
     this.filters$.pipe(
-      map((filters) => filters?.find((foundFilter) => foundFilter.property === 'notes')?.value ?? ''),
-      startWith(''),
+      map((filters) => {
+        const search = filters?.find((foundFilter) => foundFilter.property === 'notes')?.value ?? '';
+        let category = filters?.find((foundFilter) => foundFilter.property === 'category')?.value;
+
+        if (category?.length === 0) {
+          category = null;
+        }
+
+        return { search, category };
+      }),
+      startWith({ search: '', category: undefined }),
     ),
     { requireSync: true },
   );
@@ -126,13 +152,15 @@ export class AccountDetailComponent {
     this.applyFilterParams({ search: searchValue });
   }
 
-  changeCategory(category: string): void {
-    let filteredCategory: string | null = category;
+  changeCategory(category: string | null | undefined): void {
+    let filteredCategory: string | null = null;
 
-    if (category.length === 0) {
+    if (category?.length === 0) {
       filteredCategory = null;
-    } else if (category === this.nullString) {
+    } else if (category === null) {
       filteredCategory = '';
+    } else if (category !== undefined) {
+      filteredCategory = category;
     }
 
     this.applyFilterParams({ category: filteredCategory });

@@ -1,88 +1,64 @@
 :host {
-  display: flex;
-  gap: 0.5em;
-  align-items: center;
-
-  --input-field-top-padding: 1.5rem;
-}
-
-[prefix] {
-  margin-top: var(--input-field-top-padding);
+  display: block;
 }
 
 label {
   display: flex;
-  gap: 0.5em;
-  position: relative;
-  margin-top: var(--input-field-top-padding);
+  flex-direction: column;
+  gap: 0.25em;
 
   transition: opacity var(--transition-duration);
 
   .label-text {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    transform-origin: left;
-    padding-left: 0.5em;
-    opacity: 0.5;
-    pointer-events: none;
-
-    transition:
-      top var(--transition-duration),
-      transform var(--transition-duration),
-      opacity var(--transition-duration);
-  }
-
-  input {
-    padding: 0.5em;
-    border: none;
-    border-radius: 0.25em;
-    outline: none;
-
-    // TODO: how to make it relative to background color. check all color variables in code!
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--foreground);
-
-    transition: background var(-transition-duration);
-
-    &:not(:disabled) {
-      &:focus,
-      &:hover {
-        background: rgba(255, 255, 255, 0.2);
-      }
-    }
+    font-size: 0.85em;
+    padding-left: 0.25em;
   }
 
   &.clearable input {
     padding-right: 2em;
   }
 
-  input:focus + .label-text,
-  &.has-value .label-text {
-    top: calc(-1 * var(--input-field-top-padding));
-    transform: scale(0.85);
-    opacity: 1;
-    pointer-events: initial;
-  }
-
   &.disabled {
     opacity: 0.5;
   }
 
-  button.clear-button {
-    background: none;
-    border: none;
-    color: var(--foreground);
+  .input-container {
+    position: relative;
 
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    right: 0.5em;
+    input {
+      padding: 0.5em;
+      border: none;
+      border-radius: 0.25em;
+      outline: none;
 
-    cursor: pointer;
+      background: var(--background-accent-1);
+      color: var(--foreground);
 
-    &:disabled {
-      cursor: default;
+      transition: background var(--transition-duration);
+
+      &:not(:disabled) {
+        &:focus,
+        &:hover {
+          background: var(--background-accent-2);
+        }
+      }
+    }
+
+    button.clear-button {
+      background: none;
+      border: none;
+      color: var(--foreground);
+
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      right: 0.5em;
+
+      cursor: pointer;
+
+      &:disabled {
+        cursor: default;
+      }
     }
   }
 

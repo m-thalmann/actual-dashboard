@@ -1,0 +1,13 @@
+<label [class.disabled]="disabled()">
+  <span class="label-text">
+    {{ label() }}
+  </span>
+
+  <select [(ngModel)]="value" [disabled]="disabled()" [compareWith]="compareWith" #inputElement>
+    @for (option of options(); track trackBy(option.value)) {
+      <option [ngValue]="option.value">
+        {{ option.label }}
+      </option>
+    }
+  </select>
+</label>
