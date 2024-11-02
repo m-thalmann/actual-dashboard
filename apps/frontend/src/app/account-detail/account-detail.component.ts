@@ -18,11 +18,12 @@ import { AccountsDataService } from '../shared/api/accounts-data.service';
 import { TransactionsDataService } from '../shared/api/transactions-data.service';
 import { InputFieldComponent } from '../shared/components/input-field/input-field.component';
 import { PaginationComponent } from '../shared/components/pagination/pagination.component';
-import { SelectFieldComponent, SelectFieldOption } from '../shared/components/select-field/select-field.component';
+import { SelectFieldComponent } from '../shared/components/select-field/select-field.component';
 import { Account } from '../shared/models/account';
 import { ApiResponseWithMeta } from '../shared/models/api-response';
 import { PaginationMeta } from '../shared/models/pagination-meta';
 import { Transaction } from '../shared/models/transaction';
+import { AccountDetailFilterComponent } from './account-detail-filter/account-detail-filter.component';
 import { TransactionsTableComponent } from './transactions-table/transactions-table.component';
 
 @Component({
@@ -35,6 +36,7 @@ import { TransactionsTableComponent } from './transactions-table/transactions-ta
     InputFieldComponent,
     SelectFieldComponent,
     TransactionsTableComponent,
+    AccountDetailFilterComponent,
   ],
   templateUrl: './account-detail.component.html',
   styleUrl: './account-detail.component.scss',
@@ -63,24 +65,6 @@ export class AccountDetailComponent {
     ),
   );
 
-  readonly categoryOptions: Signal<Array<SelectFieldOption<string | null | undefined>>> = toSignal(
-    this.accountId$.pipe(
-      switchMap((id) => this.transactionsDataService.getCategories(id)),
-      map((loadedCategories) => loadedCategories.data),
-      map((categories) => {
-        const options = categories.map<SelectFieldOption<string | null | undefined>>((category) => ({
-          value: category,
-          label: category ?? 'No category',
-        }));
-
-        options.unshift({ value: undefined, label: 'All' });
-
-        return options;
-      }),
-    ),
-    { initialValue: [] },
-  );
-
   readonly page$: Observable<number> = this.activatedRoute.queryParamMap.pipe(
     map((params) => parseInt(params.get('page') ?? '1')),
     startWith(1),
@@ -88,6 +72,7 @@ export class AccountDetailComponent {
       refCount: true,
     }),
   );
+  readonly page: Signal<number> = toSignal(this.page$, { requireSync: true });
 
   readonly filters$: Observable<Array<FilterParams> | undefined> = this.activatedRoute.queryParamMap.pipe(
     map((params) => {
@@ -111,25 +96,7 @@ export class AccountDetailComponent {
       refCount: true,
     }),
   );
-
-  readonly page: Signal<number> = toSignal(this.page$, { requireSync: true });
-
-  readonly filters: Signal<{ search: string; category: string | null | undefined }> = toSignal(
-    this.filters$.pipe(
-      map((filters) => {
-        const search = filters?.find((foundFilter) => foundFilter.property === 'notes')?.value ?? '';
-        let category = filters?.find((foundFilter) => foundFilter.property === 'category')?.value;
-
-        if (category?.length === 0) {
-          category = null;
-        }
-
-        return { search, category };
-      }),
-      startWith({ search: '', category: undefined }),
-    ),
-    { requireSync: true },
-  );
+  readonly filters: Signal<Array<FilterParams> | undefined> = toSignal(this.filters$);
 
   readonly transactions: Signal<ApiResponseWithMeta<Array<Transaction>, PaginationMeta> | undefined> = toSignal(
     combineLatest([this.accountId$, this.page$, this.filters$]).pipe(
@@ -147,29 +114,17 @@ export class AccountDetailComponent {
     this.applyFilterParams({ page: page.toString() });
   }
 
-  doSearch(value: string): void {
-    const searchValue = value === '' ? null : value;
-    this.applyFilterParams({ search: searchValue });
+  doSearch(search: string | null): void {
+    this.applyFilterParams({ search });
   }
 
-  changeCategory(category: string | null | undefined): void {
-    let filteredCategory: string | null = null;
-
-    if (category?.length === 0) {
-      filteredCategory = null;
-    } else if (category === null) {
-      filteredCategory = '';
-    } else if (category !== undefined) {
-      filteredCategory = category;
-    }
-
-    this.applyFilterParams({ category: filteredCategory });
+  changeCategory(category: string | null): void {
+    this.applyFilterParams({ category });
   }
 
   private applyFilterParams(params: Record<string, string | null>, resetPage: boolean = true): void {
     if (resetPage && !('page' in params)) {
-      // eslint-disable-next-line @typescript-eslint/dot-notation
-      params['page'] = null;
+      params.page = null;
     }
 
     this.router.navigate([], { queryParams: params, queryParamsHandling: 'merge' });

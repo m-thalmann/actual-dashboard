@@ -5,22 +5,12 @@
 
 <div class="container">
   <div class="actions">
-    <div class="filters">
-      <app-input-field
-        [value]="filters().search"
-        label="Search"
-        placeholder="Notes"
-        (valueChange)="doSearch($event)"
-        clearable
-      />
-
-      <app-select-field
-        [value]="filters().category"
-        [options]="categoryOptions()"
-        label="Category"
-        (valueChange)="changeCategory($event)"
-      />
-    </div>
+    <app-account-detail-filter
+      [accountId]="(accountId$ | async) ?? undefined"
+      [currentFilters]="filters()"
+      (search)="doSearch($event)"
+      (categoryChange)="changeCategory($event)"
+    />
 
     <app-pagination
       [page]="page()"

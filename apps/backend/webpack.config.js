@@ -11,15 +11,8 @@ module.exports = {
       compiler: 'tsc',
       main: './src/main.ts',
       tsConfig: './tsconfig.app.json',
-      assets: [
-        './src/assets',
-        './src/data',
-        {
-          input: './src',
-          glob: '*.env',
-          output: '.',
-        },
-      ],
+      assets: ['./src/assets', './src/data', './src/.env'],
+      // TODO: add production values
       optimization: false,
       outputHashing: 'none',
     }),

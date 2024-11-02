@@ -1,0 +1,14 @@
+<app-input-field
+  [value]="filters().search"
+  label="Search"
+  placeholder="Notes"
+  (valueChange)="doSearch($event)"
+  clearable
+/>
+
+<app-select-field
+  [value]="filters().category"
+  [options]="categoryOptions()"
+  label="Category"
+  (valueChange)="changeCategory($event)"
+/>
