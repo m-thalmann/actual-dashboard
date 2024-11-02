@@ -14,6 +14,11 @@ function setupSwagger(app: INestApplication<unknown>, serverUrl: string): void {
     .setTitle('Unofficial Actual Dashboard API')
     .setVersion('1.0')
     .addServer(serverUrl)
+    .addBearerAuth({
+      type: 'http',
+      description: 'JWT Auth token',
+      bearerFormat: 'JWT',
+    })
     .build();
 
   const documentFactory: () => OpenAPIObject = () =>
@@ -28,8 +33,8 @@ async function bootstrap(): Promise<void> {
   const configService = await app.resolve(ConfigService);
   const actualService = await app.resolve(ActualService);
 
-  const port = configService.get<number>('PORT', DEFAULT_PORT);
-  const basePath = configService.get<string>('BASE_PATH', '');
+  const port = configService.get<number>('APP_PORT', DEFAULT_PORT);
+  const basePath = configService.get<string>('APP_BASE_PATH', '');
 
   // TODO: handle when remote budget cant be loaded
   await actualService.init();

@@ -1,9 +1,10 @@
 import { Controller, Post } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ActualService } from '../common/actual/actual.service';
 
 @Controller('general')
 @ApiTags('General')
+@ApiBearerAuth()
 export class GeneralController {
   constructor(private readonly actualService: ActualService) {}
 

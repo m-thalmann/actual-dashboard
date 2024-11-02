@@ -1,5 +1,5 @@
 import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
-import { ApiExtraModels, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExtraModels, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Account } from '../common/actual/actual.models';
 import { ActualService } from '../common/actual/actual.service';
 import { getResponseSchema } from '../common/util/swagger.utils';
@@ -7,6 +7,7 @@ import { AccountDto } from './dto/account.dto';
 
 @Controller('accounts')
 @ApiTags('Account')
+@ApiBearerAuth()
 @ApiExtraModels(AccountDto)
 export class AccountsController {
   constructor(private readonly actualService: ActualService) {}

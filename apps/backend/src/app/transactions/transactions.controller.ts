@@ -1,6 +1,6 @@
 import { PaginationMeta } from '@app/shared-types';
 import { Controller, Get, Param, Req } from '@nestjs/common';
-import { ApiExtraModels, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExtraModels, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { Transaction } from '../common/actual/actual.models';
 import { ActualService } from '../common/actual/actual.service';
@@ -11,6 +11,7 @@ import { TransactionDto } from './dto/transaction.dto';
 
 @Controller('accounts/:id/transactions')
 @ApiTags('Transaction')
+@ApiBearerAuth()
 @ApiExtraModels(TransactionDto)
 export class TransactionsController {
   constructor(private readonly actualService: ActualService) {}
