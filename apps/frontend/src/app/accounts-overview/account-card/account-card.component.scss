@@ -24,11 +24,11 @@ a {
       opacity: 0.5;
 
       &.positive {
-        color: #0ab50a;
+        color: var(--amount-positive);
       }
 
       &.negative {
-        color: #ff4f23;
+        color: var(--amount-negative);
       }
     }
   }

@@ -1,0 +1,75 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+header .header-content,
+main .content {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-inline: 1em;
+}
+
+header {
+  background: var(--background-secondary-1);
+  box-shadow: 0 0 1em rgba(0, 0, 0, 0.1);
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-block: 0.5em;
+
+    .left-header {
+      display: flex;
+      align-items: center;
+      gap: 1em;
+
+      a.back-link {
+        font-size: 1.5em;
+        color: inherit;
+        text-decoration: none;
+      }
+
+      h1 {
+        margin: 0;
+
+        display: flex;
+        align-items: center;
+        gap: 0.25em;
+
+        text-decoration: none;
+        color: inherit;
+
+        img {
+          height: 1.5em;
+        }
+
+        .selected-account-title {
+          display: flex;
+          gap: 1em;
+          align-items: center;
+
+          .amount {
+            font-size: 0.75em;
+            font-weight: normal;
+            color: var(--amount-positive);
+
+            &.amount-negative {
+              color: var(--amount-negative);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+main {
+  overflow: auto;
+  padding-block: 2em;
+  flex: 1;
+}

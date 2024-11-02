@@ -1,5 +1,5 @@
 import { AsyncPipe, CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, Signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnDestroy, Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FILTER_TYPES, FilterParams } from '@app/shared-types';
@@ -13,7 +13,9 @@ import {
   shareReplay,
   startWith,
   switchMap,
+  tap,
 } from 'rxjs';
+import { LayoutFacadeService } from '../layouts/layout-facade.service';
 import { AccountsDataService } from '../shared/api/accounts-data.service';
 import { TransactionsDataService } from '../shared/api/transactions-data.service';
 import { InputFieldComponent } from '../shared/components/input-field/input-field.component';
@@ -42,11 +44,12 @@ import { TransactionsTableComponent } from './transactions-table/transactions-ta
   styleUrl: './account-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AccountDetailComponent {
+export class AccountDetailComponent implements OnDestroy {
   private readonly router: Router = inject(Router);
   private readonly activatedRoute: ActivatedRoute = inject(ActivatedRoute);
   private readonly accountsDataService: AccountsDataService = inject(AccountsDataService);
   private readonly transactionsDataService: TransactionsDataService = inject(TransactionsDataService);
+  private readonly layoutFacade: LayoutFacadeService = inject(LayoutFacadeService);
 
   readonly accountId$: Observable<string> = this.activatedRoute.paramMap.pipe(
     map((params) => params.get('accountId')),
@@ -62,6 +65,7 @@ export class AccountDetailComponent {
     this.accountId$.pipe(
       switchMap((id) => this.accountsDataService.getAccountDetails(id)),
       map((account) => account.data ?? undefined),
+      tap((account: Account | undefined) => this.layoutFacade.setSelectedAccount(account)),
     ),
   );
 
@@ -128,5 +132,9 @@ export class AccountDetailComponent {
     }
 
     this.router.navigate([], { queryParams: params, queryParamsHandling: 'merge' });
+  }
+
+  ngOnDestroy(): void {
+    this.layoutFacade.setSelectedAccount(undefined);
   }
 }

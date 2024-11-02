@@ -1,0 +1,33 @@
+<header>
+  <div class="header-content">
+    <div class="left-header">
+      @if (layoutFacade.selectedAccount()) {
+        <a routerLink="/" class="back-link">
+          <i class="fa-solid fa-arrow-left"></i>
+        </a>
+      }
+
+      <h1>
+        <img src="icon.png" alt="App Icon" />
+
+        @if (layoutFacade.selectedAccount(); as selectedAccount) {
+          <div class="selected-account-title">
+            {{ selectedAccount.name }}
+
+            <div class="amount" [class.amount-negative]="selectedAccount.amount < 0">
+              {{ selectedAccount.amount / 100 | currency }}
+            </div>
+          </div>
+        } @else {
+          <div class="title">Unofficial Actual Dashboard</div>
+        }
+      </h1>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="content">
+    <router-outlet />
+  </div>
+</main>
