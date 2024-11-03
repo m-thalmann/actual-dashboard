@@ -23,7 +23,7 @@ export class BaseApiService {
     };
   }
 
-  protected request<T>(request: HttpRequest<T>, options?: RequestOptions): Observable<T> {
+  protected request<T>(request: HttpRequest<unknown>, options?: RequestOptions): Observable<T> {
     const headers = this.httpHeaders;
 
     const params = {
@@ -47,7 +47,11 @@ export class BaseApiService {
   }
 
   get<T>(url: string, options?: RequestOptions): Observable<T> {
-    return this.request<T>(new HttpRequest<T>('GET', url), options);
+    return this.request<T>(new HttpRequest('GET', url), options);
+  }
+
+  post<T>(url: string, body: unknown, options?: RequestOptions): Observable<T> {
+    return this.request<T>(new HttpRequest('POST', url, body), options);
   }
 
   protected generateFilterParams(filters?: Array<FilterParams>): Record<string, string> | null {

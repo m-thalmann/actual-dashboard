@@ -19,7 +19,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputFieldComponent {
-  readonly value: ModelSignal<string> = model.required<string>();
+  readonly value: ModelSignal<string> = model<string>('');
   readonly type: InputSignal<string> = input('text');
   readonly label: InputSignal<string> = input.required();
   readonly placeholder: InputSignal<string> = input('');
