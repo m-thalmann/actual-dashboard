@@ -1,16 +1,20 @@
-import { HttpParams, provideHttpClient } from '@angular/common/http';
+import { HttpHeaders, HttpParams, HttpRequest, provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Injectable } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { FILTER_TYPES } from '@app/shared-types';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Observable, of } from 'rxjs';
 import { API_BASE_URL } from '../../app.config';
-import { BaseApiService } from './base-api.service';
+import { BaseApiService, RequestOptions } from './base-api.service';
 
 const MOCK_API_BASE_URL = 'http://localhost:3000';
 
 @Injectable()
 class BaseApiServiceTestClass extends BaseApiService {
+  override request<T>(request: HttpRequest<T>, options?: RequestOptions): Observable<T> {
+    return super.request(request, options);
+  }
+
   override generateFilterParams(
     ...args: Parameters<BaseApiService['generateFilterParams']>
   ): ReturnType<BaseApiService['generateFilterParams']> {
@@ -21,10 +25,6 @@ class BaseApiServiceTestClass extends BaseApiService {
     ...args: Parameters<BaseApiService['generatePaginationParams']>
   ): ReturnType<BaseApiService['generatePaginationParams']> {
     return super.generatePaginationParams(...args);
-  }
-
-  override mergeParams(...args: Parameters<BaseApiService['mergeParams']>): ReturnType<BaseApiService['mergeParams']> {
-    return super.mergeParams(...args);
   }
 }
 
@@ -50,15 +50,19 @@ describe('BaseApiService', () => {
     expect(service).toBeTruthy();
   });
 
-  describe('get', () => {
-    it('should make a GET request with the provided URL', async () => {
-      const url = 'test';
+  describe('request', () => {
+    it('should make a request with the provided HttpRequest', async () => {
+      const request = new HttpRequest('GET', 'test');
       const response = { data: 'test' };
 
-      const resultPromise = firstValueFrom(service.get(url));
+      const resultPromise = firstValueFrom(service.request(request));
 
-      const req = httpTesting.expectOne(`${MOCK_API_BASE_URL}/${url}`);
+      const req = httpTesting.expectOne(`${MOCK_API_BASE_URL}/${request.url}`);
       expect(req.request.method).toBe('GET');
+
+      Object.entries(service.httpHeaders).forEach(([key, value]) => {
+        expect(req.request.headers.get(key)).toBe(value);
+      });
 
       req.flush(response);
       const result = await resultPromise;
@@ -66,20 +70,18 @@ describe('BaseApiService', () => {
       expect(result).toEqual(response);
     });
 
-    it('should make a GET request with the provided URL and pagination params', async () => {
-      service.generatePaginationParams = jest
-        .fn()
-        .mockImplementation(() => new HttpParams().append('page', '1').append('page-size', '10'));
+    it('should make a request with the provided HttpRequest and pagination params', async () => {
+      const generatePaginationParamsSpy = jest
+        .spyOn(service, 'generatePaginationParams')
+        .mockReturnValue({ page: '1', 'page-size': '10' });
 
-      const generatePaginationParamsSpy = jest.spyOn(service, 'generatePaginationParams');
-
-      const url = 'test';
+      const request = new HttpRequest('GET', 'test');
       const response = { data: 'test' };
       const pagination = { page: 1, pageSize: 10 };
 
-      const resultPromise = firstValueFrom(service.get(url, { pagination }));
+      const resultPromise = firstValueFrom(service.request(request, { pagination }));
 
-      const req = httpTesting.expectOne(`${MOCK_API_BASE_URL}/${url}?page=1&page-size=10`);
+      const req = httpTesting.expectOne(`${MOCK_API_BASE_URL}/${request.url}?page=1&page-size=10`);
       expect(req.request.method).toBe('GET');
 
       req.flush(response);
@@ -89,20 +91,18 @@ describe('BaseApiService', () => {
       expect(generatePaginationParamsSpy).toHaveBeenCalledWith(pagination);
     });
 
-    it('should make a GET request with the provided URL and filter params', async () => {
-      service.generateFilterParams = jest
-        .fn()
-        .mockImplementation(() => new HttpParams().append('filter[name][like]', 'test'));
+    it('should make a request with the provided HttpRequest and filter params', async () => {
+      const generateFilterParamsSpy = jest
+        .spyOn(service, 'generateFilterParams')
+        .mockReturnValue({ 'filter[name][like]': 'test' });
 
-      const generateFilterParamsSpy = jest.spyOn(service, 'generateFilterParams');
-
-      const url = 'test';
+      const request = new HttpRequest('GET', 'test');
       const response = { data: 'test' };
       const filters = [{ property: 'name', type: FILTER_TYPES.LIKE, value: 'test' }];
 
-      const resultPromise = firstValueFrom(service.get(url, { filters }));
+      const resultPromise = firstValueFrom(service.request(request, { filters }));
 
-      const req = httpTesting.expectOne(`${MOCK_API_BASE_URL}/${url}?${encodeURI('filter[name][like]=test')}`);
+      const req = httpTesting.expectOne(`${MOCK_API_BASE_URL}/${request.url}?${encodeURI('filter[name][like]=test')}`);
       expect(req.request.method).toBe('GET');
 
       req.flush(response);
@@ -112,35 +112,57 @@ describe('BaseApiService', () => {
       expect(generateFilterParamsSpy).toHaveBeenCalledWith(filters);
     });
 
-    it('should make a GET request with the provided URL, pagination and filter params', async () => {
-      service.generatePaginationParams = jest
-        .fn()
-        .mockImplementation(() => new HttpParams().append('page', '1').append('page-size', '10'));
-      service.generateFilterParams = jest
-        .fn()
-        .mockImplementation(() => new HttpParams().append('filter[name][like]', 'test'));
+    it('should merge params and headers', async () => {
+      const generatePaginationParamsSpy = jest
+        .spyOn(service, 'generatePaginationParams')
+        .mockReturnValue({ page: '1', 'page-size': '10' });
+      const generateFilterParamsSpy = jest
+        .spyOn(service, 'generateFilterParams')
+        .mockReturnValue({ 'filter[name][like]': 'test' });
 
-      const generatePaginationParamsSpy = jest.spyOn(service, 'generatePaginationParams');
-      const generateFilterParamsSpy = jest.spyOn(service, 'generateFilterParams');
+      const requestParams = new HttpParams().append('param1', 'value1');
+      const requestHeaders = new HttpHeaders().append('header1', 'value1');
 
-      const url = 'test';
+      const request = new HttpRequest('GET', 'test', { params: requestParams, headers: requestHeaders });
       const response = { data: 'test' };
       const pagination = { page: 1, pageSize: 10 };
       const filters = [{ property: 'name', type: FILTER_TYPES.LIKE, value: 'test' }];
 
-      const resultPromise = firstValueFrom(service.get(url, { pagination, filters }));
+      const resultPromise = firstValueFrom(service.request(request, { pagination, filters }));
 
       const req = httpTesting.expectOne(
-        `${MOCK_API_BASE_URL}/${url}?page=1&page-size=10&${encodeURI('filter[name][like]=test')}`,
+        `${MOCK_API_BASE_URL}/${request.url}?param1=value1&page=1&page-size=10&${encodeURI('filter[name][like]=test')}`,
       );
       expect(req.request.method).toBe('GET');
 
+      Object.entries(service.httpHeaders).forEach(([key, value]) => {
+        expect(req.request.headers.get(key)).toBe(value);
+      });
+      requestHeaders.keys().forEach((key) => {
+        expect(req.request.headers.get(key)).toBe(requestHeaders.get(key));
+      });
+
       req.flush(response);
       const result = await resultPromise;
 
       expect(result).toEqual(response);
       expect(generatePaginationParamsSpy).toHaveBeenCalledWith(pagination);
       expect(generateFilterParamsSpy).toHaveBeenCalledWith(filters);
+    });
+  });
+
+  describe('get', () => {
+    it('should proxy the request method', async () => {
+      const response = { data: 'test' };
+      const requestSpy = jest.spyOn(service, 'request').mockReturnValue(of(response));
+
+      const url = 'test';
+      const options = { pagination: { page: 1, pageSize: 10 } };
+
+      const result = await firstValueFrom(service.get<typeof response>(url, options));
+
+      expect(result).toEqual(response);
+      expect(requestSpy).toHaveBeenCalledWith(new HttpRequest('GET', url), options);
     });
   });
 
@@ -157,16 +179,16 @@ describe('BaseApiService', () => {
       expect(result).toBeNull();
     });
 
-    it('should return HttpParams with filter options', () => {
+    it('should return the filter options', () => {
       const filters = [
         { property: 'name', type: FILTER_TYPES.LIKE, value: 'test' },
         { property: 'id', type: FILTER_TYPES.EQUAL, value: '1' },
       ];
-      const expectedString = encodeURI('filter[name][like]=test&filter[id][eq]=1');
+      const expectedParams = { 'filter[name][like]': 'test', 'filter[id][eq]': '1' };
 
       const result = service.generateFilterParams(filters);
 
-      expect(result?.toString()).toEqual(expectedString);
+      expect(result).toEqual(expectedParams);
     });
   });
 
@@ -177,69 +199,22 @@ describe('BaseApiService', () => {
       expect(result).toBeNull();
     });
 
-    it('should return HttpParams with page and page-size', () => {
+    it('should return object with page and page-size', () => {
       const pagination = { page: 1, pageSize: 10 };
-      const expectedString = encodeURI('page=1&page-size=10');
+      const expectedParams = { page: '1', 'page-size': '10' };
 
       const result = service.generatePaginationParams(pagination);
 
-      expect(result?.toString()).toEqual(expectedString);
+      expect(result).toEqual(expectedParams);
     });
 
-    it('should return HttpParams with default page size', () => {
+    it('should return object with default page size', () => {
       const pagination = { page: 1 };
-      const expectedString = encodeURI(`page=1&page-size=${BaseApiService.DEFAULT_PAGE_SIZE}`);
+      const expectedParams = { page: '1', 'page-size': BaseApiService.DEFAULT_PAGE_SIZE.toString() };
 
       const result = service.generatePaginationParams(pagination);
 
-      expect(result?.toString()).toEqual(expectedString);
-    });
-  });
-
-  describe('mergeParams', () => {
-    it('should return HttpParams with merged values', () => {
-      const params1 = new HttpParams().appendAll({
-        param1: 'value1',
-        param2: 'value2',
-      });
-
-      const params2 = new HttpParams().appendAll({
-        param3: 'value3',
-        param4: 'value4',
-      });
-
-      const expectedString = encodeURI('param1=value1&param2=value2&param3=value3&param4=value4');
-
-      const result = service.mergeParams(params1, params2);
-
-      expect(result?.toString()).toEqual(expectedString);
-    });
-
-    it('should ignore null HttpParams', () => {
-      const params1 = new HttpParams().appendAll({
-        param1: 'value1',
-        param2: 'value2',
-      });
-
-      const params2 = null;
-
-      const expectedString = encodeURI('param1=value1&param2=value2');
-
-      const result = service.mergeParams(params1, params2);
-
-      expect(result?.toString()).toEqual(expectedString);
-    });
-
-    it('should return undefined when no HttpParams are provided', () => {
-      const result = service.mergeParams();
-
-      expect(result).toBeUndefined();
-    });
-
-    it('should return undefined when only null HttpParams are provided', () => {
-      const result = service.mergeParams(null, null);
-
-      expect(result).toBeUndefined();
+      expect(result).toEqual(expectedParams);
     });
   });
 });

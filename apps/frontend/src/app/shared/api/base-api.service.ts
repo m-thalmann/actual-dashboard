@@ -1,9 +1,14 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpRequest, HttpResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { FilterParams } from '@app/shared-types';
-import { Observable } from 'rxjs';
+import { filter, first, map, Observable, shareReplay } from 'rxjs';
 import { API_BASE_URL } from '../../app.config';
 import { PaginationConfig } from '../models/pagination-config';
+
+export interface RequestOptions {
+  pagination?: PaginationConfig;
+  filters?: Array<FilterParams>;
+}
 
 @Injectable({ providedIn: 'root' })
 export class BaseApiService {
@@ -12,29 +17,53 @@ export class BaseApiService {
   private readonly http: HttpClient = inject(HttpClient);
   private readonly apiUrl: string = inject(API_BASE_URL);
 
-  get<T>(url: string, options?: { pagination?: PaginationConfig; filters?: Array<FilterParams> }): Observable<T> {
-    return this.http.get<T>(`${this.apiUrl}/${url}`, {
-      params: this.mergeParams(
-        this.generatePaginationParams(options?.pagination),
-        this.generateFilterParams(options?.filters),
-      ),
-    });
+  get httpHeaders(): Record<string, Array<string> | string> {
+    return {
+      'Content-Type': 'application/json',
+    };
   }
 
-  protected generateFilterParams(filters?: Array<FilterParams>): HttpParams | null {
+  protected request<T>(request: HttpRequest<T>, options?: RequestOptions): Observable<T> {
+    const headers = this.httpHeaders;
+
+    const params = {
+      ...this.generatePaginationParams(options?.pagination),
+      ...this.generateFilterParams(options?.filters),
+    };
+
+    const finalRequest = request.clone({
+      url: `${this.apiUrl}/${request.url}`,
+      setParams: params,
+      setHeaders: headers,
+    });
+
+    return this.http.request<T>(finalRequest).pipe(
+      shareReplay({ refCount: true }),
+      filter((response): response is HttpResponse<T> => response instanceof HttpResponse),
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      map((response: HttpResponse<T>) => response.body!),
+      first(),
+    );
+  }
+
+  get<T>(url: string, options?: RequestOptions): Observable<T> {
+    return this.request<T>(new HttpRequest<T>('GET', url), options);
+  }
+
+  protected generateFilterParams(filters?: Array<FilterParams>): Record<string, string> | null {
     if (!filters || filters.length === 0) {
       return null;
     }
 
     return filters.reduce((params, filterOption) => {
-      const filter = `filter[${filterOption.property}][${filterOption.type}]`;
-      const value = filterOption.value ?? '';
+      const filterKey = `filter[${filterOption.property}][${filterOption.type}]`;
+      const filterValue = filterOption.value ?? '';
 
-      return params.append(filter, value.toString());
-    }, new HttpParams());
+      return { ...params, [filterKey]: filterValue.toString() };
+    }, {});
   }
 
-  protected generatePaginationParams(pagination?: PaginationConfig): HttpParams | null {
+  protected generatePaginationParams(pagination?: PaginationConfig): Record<string, string> | null {
     if (pagination === undefined) {
       return null;
     }
@@ -42,27 +71,9 @@ export class BaseApiService {
     const pageSize = pagination.pageSize ?? BaseApiService.DEFAULT_PAGE_SIZE;
     const page = pagination.page;
 
-    return new HttpParams().append('page', page).append('page-size', pageSize);
-  }
-
-  protected mergeParams(...httpParams: Array<HttpParams | null>): HttpParams | undefined {
-    const mergedParams: Record<string, Array<string>> = {};
-
-    for (const params of httpParams) {
-      if (params) {
-        for (const param of params.keys()) {
-          const value = params.getAll(param);
-          if (value !== null) {
-            mergedParams[param] = value;
-          }
-        }
-      }
-    }
-
-    if (Object.keys(mergedParams).length === 0) {
-      return undefined;
-    }
-
-    return new HttpParams().appendAll(mergedParams);
+    return {
+      page: page.toString(),
+      'page-size': pageSize.toString(),
+    };
   }
 }
