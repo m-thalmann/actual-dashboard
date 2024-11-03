@@ -1,15 +1,27 @@
 import { AsyncPipe, CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, OnDestroy, Signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  OnDestroy,
+  signal,
+  Signal,
+  WritableSignal,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FILTER_TYPES, FilterParams } from '@app/shared-types';
 import {
+  catchError,
   combineLatest,
   debounceTime,
   distinctUntilChanged,
+  EMPTY,
   filter,
   map,
   Observable,
+  of,
   shareReplay,
   startWith,
   switchMap,
@@ -18,7 +30,9 @@ import {
 import { LayoutFacadeService } from '../layouts/layout-facade.service';
 import { AccountsDataService } from '../shared/api/accounts-data.service';
 import { TransactionsDataService } from '../shared/api/transactions-data.service';
+import { ErrorDisplayComponent } from '../shared/components/error-display/error-display.component';
 import { InputFieldComponent } from '../shared/components/input-field/input-field.component';
+import { LoadingSpinnerComponent } from '../shared/components/loading-spinner/loading-spinner.component';
 import { PaginationComponent } from '../shared/components/pagination/pagination.component';
 import { SelectFieldComponent } from '../shared/components/select-field/select-field.component';
 import { Account } from '../shared/models/account';
@@ -39,6 +53,8 @@ import { TransactionsTableComponent } from './transactions-table/transactions-ta
     SelectFieldComponent,
     TransactionsTableComponent,
     AccountDetailFilterComponent,
+    ErrorDisplayComponent,
+    LoadingSpinnerComponent,
   ],
   templateUrl: './account-detail.component.html',
   styleUrl: './account-detail.component.scss',
@@ -60,14 +76,21 @@ export class AccountDetailComponent implements OnDestroy {
     }),
   );
 
-  // TODO: handle 404 -> null
-  readonly accountDetails: Signal<Account | undefined> = toSignal(
-    this.accountId$.pipe(
-      switchMap((id) => this.accountsDataService.getAccountDetails(id)),
-      map((account) => account.data ?? undefined),
-      tap((account: Account | undefined) => this.layoutFacade.setSelectedAccount(account)),
+  protected readonly accountDetails$: Observable<Account> = this.accountId$.pipe(
+    switchMap((id) => this.accountsDataService.getAccountDetails(id)),
+    map((account) => account.data),
+    tap((account: Account) => this.layoutFacade.setSelectedAccount(account)),
+    shareReplay({ refCount: true }),
+  );
+
+  readonly detailsLoadingError: Signal<Error | undefined> = toSignal(
+    this.accountDetails$.pipe(
+      switchMap(() => EMPTY),
+      catchError((error: Error) => of(error)),
     ),
   );
+
+  readonly accountDetails: Signal<Account | undefined> = toSignal(this.accountDetails$);
 
   readonly page$: Observable<number> = this.activatedRoute.queryParamMap.pipe(
     map((params) => parseInt(params.get('page') ?? '1')),
@@ -102,17 +125,41 @@ export class AccountDetailComponent implements OnDestroy {
   );
   readonly filters: Signal<Array<FilterParams> | undefined> = toSignal(this.filters$);
 
-  readonly transactions: Signal<ApiResponseWithMeta<Array<Transaction>, PaginationMeta> | undefined> = toSignal(
-    combineLatest([this.accountId$, this.page$, this.filters$]).pipe(
-      debounceTime(1), // prevent multiple requests when changing filters and page at the same time
-      switchMap(([id, page, filters]) =>
-        this.transactionsDataService.getTransactions(id, {
-          pagination: { page },
-          filters,
-        }),
-      ),
+  readonly loading: WritableSignal<boolean> = signal(true);
+
+  protected readonly transactions$: Observable<ApiResponseWithMeta<Array<Transaction>, PaginationMeta>> = combineLatest(
+    [this.accountId$, this.page$, this.filters$],
+  ).pipe(
+    debounceTime(1), // prevent multiple requests when changing filters and page at the same time
+    tap(() => this.loading.set(true)),
+    switchMap(([id, page, filters]) =>
+      this.transactionsDataService.getTransactions(id, {
+        pagination: { page },
+        filters,
+      }),
+    ),
+    tap(() => this.loading.set(false)),
+    shareReplay({ refCount: true }),
+  );
+
+  readonly loadingError: Signal<Error | undefined> = toSignal(
+    this.transactions$.pipe(
+      switchMap(() => EMPTY),
+      catchError((error: Error) => of(error)),
+      tap(() => this.loading.set(false)),
     ),
   );
+
+  readonly transactions: Signal<ApiResponseWithMeta<Array<Transaction>, PaginationMeta> | undefined> = toSignal(
+    this.transactions$,
+  );
+
+  readonly combinedLoadingError: Signal<Error | undefined> = computed(() => {
+    const detailsLoadingError = this.detailsLoadingError();
+    const loadingError = this.loadingError();
+
+    return detailsLoadingError ?? loadingError;
+  });
 
   updatePage(page: number): void {
     this.applyFilterParams({ page: page.toString() });

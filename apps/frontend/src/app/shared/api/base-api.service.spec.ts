@@ -11,7 +11,7 @@ const MOCK_API_BASE_URL = 'http://localhost:3000';
 
 @Injectable()
 class BaseApiServiceTestClass extends BaseApiService {
-  override request<T>(request: HttpRequest<T>, options?: RequestOptions): Observable<T> {
+  override request<T>(request: HttpRequest<unknown>, options?: RequestOptions): Observable<T> {
     return super.request(request, options);
   }
 

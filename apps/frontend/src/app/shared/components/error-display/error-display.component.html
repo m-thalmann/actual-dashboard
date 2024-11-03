@@ -1,0 +1,39 @@
+@if (error(); as error) {
+  <div class="error-container">
+    <div class="icon">
+      @switch (type()) {
+        @case ('not-found') {
+          <i class="fa-solid fa-circle-question"></i>
+        }
+        @default {
+          <i class="fa-solid fa-circle-exclamation"></i>
+        }
+      }
+    </div>
+
+    <div class="message">
+      @switch (type()) {
+        @case ('not-found') {
+          @if (notFoundMessageTemplate(); as notFoundMessageTemplate) {
+            <ng-container *ngTemplateOutlet="notFoundMessageTemplate"></ng-container>
+          } @else {
+            Not found!
+          }
+        }
+        @default {
+          @if (errorMessageTemplate(); as errorMessageTemplate) {
+            <ng-container *ngTemplateOutlet="errorMessageTemplate"></ng-container>
+          } @else {
+            An error occurred!
+          }
+
+          @if (message(); as message) {
+            <small>
+              {{ message }}
+            </small>
+          }
+        }
+      }
+    </div>
+  </div>
+}

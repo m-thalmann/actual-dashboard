@@ -12,7 +12,7 @@ export class AccountsDataService {
     return this.baseApiService.get<ApiResponse<Array<Account>>>(`accounts`);
   }
 
-  getAccountDetails(accountId: string): Observable<ApiResponse<Account | null>> {
+  getAccountDetails(accountId: string): Observable<ApiResponse<Account>> {
     return this.baseApiService.get<ApiResponse<Account>>(`accounts/${accountId}`);
   }
 }

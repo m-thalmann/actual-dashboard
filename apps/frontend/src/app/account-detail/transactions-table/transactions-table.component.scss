@@ -1,12 +1,15 @@
 :host {
   display: block;
+  position: relative;
+
+  border-radius: 0.25em;
 }
 
 table {
   width: 100%;
   border: none;
   border-collapse: collapse;
-  border-radius: 0.25em;
+  border-radius: inherit;
 
   background: var(--background-accent-1);
 
@@ -37,5 +40,32 @@ table {
     &:hover {
       background: var(--background-accent-2);
     }
+  }
+}
+
+.disabled-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  border-radius: inherit;
+
+  background: rgba(0, 0, 0, 0.5);
+
+  animation: fade-in 0.125s;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

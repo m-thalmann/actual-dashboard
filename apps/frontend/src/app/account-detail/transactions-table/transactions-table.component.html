@@ -31,3 +31,9 @@
     }
   </tbody>
 </table>
+
+@if (disabled()) {
+  <div class="disabled-overlay">
+    <app-loading-spinner />
+  </div>
+}

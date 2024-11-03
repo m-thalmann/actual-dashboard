@@ -3,6 +3,7 @@
     <app-account-detail-filter
       [accountId]="(accountId$ | async) ?? undefined"
       [currentFilters]="filters()"
+      [disabled]="loading()"
       (search)="doSearch($event)"
       (categoryChange)="changeCategory($event)"
     />
@@ -10,10 +11,19 @@
     <app-pagination
       [page]="page()"
       [totalPages]="transactions()?.meta?.lastPage ?? 0"
+      [disabled]="loading()"
       (prevPage)="updatePage(page() - 1)"
       (nextPage)="updatePage(page() + 1)"
     />
   </div>
 
-  <app-transactions-table [transactions]="transactions()?.data ?? []" />
+  @if (combinedLoadingError(); as loadingError) {
+    <app-error-display [error]="loadingError">
+      <ng-template #notFoundMessage>Account could not be found</ng-template>
+    </app-error-display>
+  } @else if (loading() && transactions() === undefined) {
+    <app-loading-spinner />
+  } @else {
+    <app-transactions-table [transactions]="transactions()?.data ?? []" [disabled]="loading()" />
+  }
 </div>

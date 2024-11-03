@@ -1,18 +1,22 @@
 import { CommonModule } from '@angular/common';
 import {
+  booleanAttribute,
   ChangeDetectionStrategy,
   Component,
   computed,
   inject,
   input,
   InputSignal,
+  InputSignalWithTransform,
   output,
   OutputEmitterRef,
+  signal,
   Signal,
+  WritableSignal,
 } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FilterParams } from '@app/shared-types';
-import { filter, map, Observable, switchMap } from 'rxjs';
+import { catchError, EMPTY, filter, map, Observable, of, shareReplay, switchMap, tap } from 'rxjs';
 import { TransactionsDataService } from '../../shared/api/transactions-data.service';
 import { InputFieldComponent } from '../../shared/components/input-field/input-field.component';
 import { SelectFieldComponent, SelectFieldOption } from '../../shared/components/select-field/select-field.component';
@@ -35,14 +39,32 @@ export class AccountDetailFilterComponent {
     Array<FilterParams> | undefined
   >();
 
+  readonly disabled: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
+
   readonly search: OutputEmitterRef<string | null> = output<string | null>();
   readonly categoryChange: OutputEmitterRef<string | null> = output<string | null>();
 
+  readonly categoriesLoading: WritableSignal<boolean> = signal(false);
+
+  protected readonly categories$: Observable<Array<string | null>> = this.accountId$.pipe(
+    filter((id) => id !== undefined),
+    tap(() => this.categoriesLoading.set(true)),
+    switchMap((id) => this.transactionsDataService.getCategories(id)),
+    map((loadedCategories) => loadedCategories.data),
+    tap(() => this.categoriesLoading.set(false)),
+    shareReplay({ refCount: true }),
+  );
+
+  readonly categoriesLoadingError: Signal<Error | undefined> = toSignal(
+    this.categories$.pipe(
+      switchMap(() => EMPTY),
+      catchError((error: Error) => of(error)),
+      tap(() => this.categoriesLoading.set(false)),
+    ),
+  );
+
   readonly categoryOptions: Signal<Array<SelectFieldOption<string | null | undefined>>> = toSignal(
-    this.accountId$.pipe(
-      filter((id) => id !== undefined),
-      switchMap((id) => this.transactionsDataService.getCategories(id)),
-      map((loadedCategories) => loadedCategories.data),
+    this.categories$.pipe(
       map((categories) => {
         const options = categories.map<SelectFieldOption<string | null | undefined>>((category) => ({
           value: category,
@@ -53,6 +75,7 @@ export class AccountDetailFilterComponent {
 
         return options;
       }),
+      catchError(() => of([])),
     ),
     { initialValue: [] },
   );

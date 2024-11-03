@@ -2,6 +2,7 @@
   [value]="filters().search"
   label="Search"
   placeholder="Notes"
+  [disabled]="disabled()"
   (valueChange)="doSearch($event)"
   clearable
 />
@@ -10,5 +11,13 @@
   [value]="filters().category"
   [options]="categoryOptions()"
   label="Category"
+  [disabled]="disabled() || categoriesLoading() || categoriesLoadingError() !== undefined"
   (valueChange)="changeCategory($event)"
 />
+
+@if (categoriesLoadingError(); as categoriesLoadingError) {
+  <span class="error">
+    <i class="fa fa-exclamation-circle"></i>
+    Error loading categories
+  </span>
+}

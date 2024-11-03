@@ -21,7 +21,7 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
 
   return next(nextRequest).pipe(
     catchError((error: unknown) => {
-      if (error instanceof HttpErrorResponse && error.status === Number(HttpStatusCode.Unauthorized)) {
+      if (error instanceof HttpErrorResponse && error.status === HttpStatusCode.Unauthorized.valueOf()) {
         authService.logout();
       }
       return throwError(() => error);

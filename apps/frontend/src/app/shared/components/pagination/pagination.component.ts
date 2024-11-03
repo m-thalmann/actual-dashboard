@@ -1,5 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input, InputSignal, output, OutputEmitterRef } from '@angular/core';
+import {
+  booleanAttribute,
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  InputSignal,
+  InputSignalWithTransform,
+  output,
+  OutputEmitterRef,
+} from '@angular/core';
 
 @Component({
   selector: 'app-pagination',
@@ -12,6 +21,7 @@ import { ChangeDetectionStrategy, Component, input, InputSignal, output, OutputE
 export class PaginationComponent {
   readonly page: InputSignal<number> = input.required<number>();
   readonly totalPages: InputSignal<number> = input.required<number>();
+  readonly disabled: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
 
   readonly prevPage: OutputEmitterRef<void> = output<void>();
   readonly nextPage: OutputEmitterRef<void> = output<void>();

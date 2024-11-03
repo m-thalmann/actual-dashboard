@@ -1,5 +1,13 @@
 import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
-import { ApiBearerAuth, ApiExtraModels, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiExtraModels,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Account } from '../common/actual/actual.models';
 import { ActualService } from '../common/actual/actual.service';
 import { getResponseSchema } from '../common/util/swagger.utils';
@@ -28,6 +36,7 @@ export class AccountsController {
   @ApiOkResponse({
     schema: getResponseSchema(AccountDto),
   })
+  @ApiNotFoundResponse({ description: 'Account not found' })
   @ApiParam({ name: 'id', format: 'uuid' })
   async findOne(@Param('id') accountId: string): Promise<{ data: Account }> {
     const details = await this.actualService.getAccountDetails(accountId);
