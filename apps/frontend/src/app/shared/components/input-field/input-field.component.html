@@ -1,4 +1,9 @@
-<label [class.disabled]="disabled()" [class.has-value]="value().length > 0" [class.clearable]="clearable()">
+<label
+  [class.disabled]="disabled()"
+  [class.has-value]="value().length > 0"
+  [class.clearable]="clearable()"
+  [class.bulky]="bulky()"
+>
   <span class="label-text">
     {{ label() }}
   </span>
@@ -8,8 +13,9 @@
       [type]="type()"
       [value]="value()"
       [placeholder]="placeholder()"
-      (change)="value.set(inputElement.value)"
       [disabled]="disabled()"
+      (change)="value.set(inputElement.value)"
+      (keyup.enter)="submit.emit()"
       #inputElement
     />
 

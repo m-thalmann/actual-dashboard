@@ -38,3 +38,30 @@ html {
 *::after {
   box-sizing: border-box;
 }
+
+button {
+  background: var(--primary);
+  color: var(--foreground);
+  border: none;
+  border-radius: 0.25em;
+  cursor: pointer;
+  padding: 0.5em 1em;
+
+  transition: background 0.2s;
+
+  &.icon-button {
+    font-size: 1em;
+    width: 2em;
+    height: 2em;
+    padding: 0;
+  }
+
+  &:hover {
+    background: var(--primary-hover);
+  }
+
+  &:disabled {
+    background: rgba(0, 0, 0, 0.1);
+    cursor: default;
+  }
+}

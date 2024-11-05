@@ -12,6 +12,7 @@ describe('ErrorDisplayComponent', () => {
 
     fixture = TestBed.createComponent(ErrorDisplayComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('error', undefined);
     fixture.detectChanges();
   });
 

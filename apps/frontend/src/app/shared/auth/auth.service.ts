@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { BehaviorSubject, distinctUntilChanged, map, Observable } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, map, Observable, skip } from 'rxjs';
 
 export interface AuthData {
   token: string;
@@ -16,18 +17,37 @@ export class AuthService {
 
   private readonly router: Router = inject(Router);
 
-  protected readonly authData$: BehaviorSubject<AuthData | null> = new BehaviorSubject<AuthData | null>(null);
-  readonly token$: Observable<string | null> = this.authData$.pipe(
-    map((data) => data?.token ?? null),
-    distinctUntilChanged(),
-  );
-  readonly username$: Observable<string | null> = this.authData$.pipe(
-    map((data) => data?.username ?? null),
-    distinctUntilChanged(),
-  );
+  protected readonly authData$: BehaviorSubject<AuthData | null>;
+  readonly token$: Observable<string | null>;
+  readonly username$: Observable<string | null>;
 
   constructor() {
-    this.reloadData();
+    const token = localStorage.getItem(AuthService.TOKEN_STORAGE_KEY);
+    const username = localStorage.getItem(AuthService.USERNAME_STORAGE_KEY);
+
+    const authData = token && username ? { token, username } : null;
+
+    this.authData$ = new BehaviorSubject<AuthData | null>(authData);
+
+    this.token$ = this.authData$.pipe(
+      map((data) => data?.token ?? null),
+      distinctUntilChanged(),
+    );
+    this.username$ = this.authData$.pipe(
+      map((data) => data?.username ?? null),
+      distinctUntilChanged(),
+    );
+
+    this.authData$.pipe(skip(1), takeUntilDestroyed()).subscribe((data) => {
+      if (data === null) {
+        localStorage.removeItem(AuthService.TOKEN_STORAGE_KEY);
+        localStorage.removeItem(AuthService.USERNAME_STORAGE_KEY);
+        return;
+      }
+
+      localStorage.setItem(AuthService.TOKEN_STORAGE_KEY, data.token);
+      localStorage.setItem(AuthService.USERNAME_STORAGE_KEY, data.username);
+    });
   }
 
   getToken(): string | null {
@@ -39,29 +59,14 @@ export class AuthService {
   }
 
   login(username: string, token: string): void {
-    localStorage.setItem(AuthService.USERNAME_STORAGE_KEY, username);
-    localStorage.setItem(AuthService.TOKEN_STORAGE_KEY, token);
-    this.reloadData();
-  }
-
-  logout(): void {
-    localStorage.removeItem(AuthService.TOKEN_STORAGE_KEY);
-    localStorage.removeItem(AuthService.USERNAME_STORAGE_KEY);
-    this.reloadData();
-    this.router.navigateByUrl('/login');
-  }
-
-  protected reloadData(): void {
-    const token = localStorage.getItem(AuthService.TOKEN_STORAGE_KEY);
-    const username = localStorage.getItem(AuthService.USERNAME_STORAGE_KEY);
-    if (token === null || username === null) {
-      this.authData$.next(null);
-      return;
-    }
-
     this.authData$.next({
       token,
       username,
     });
+  }
+
+  logout(): void {
+    this.authData$.next(null);
+    this.router.navigateByUrl('/login');
   }
 }

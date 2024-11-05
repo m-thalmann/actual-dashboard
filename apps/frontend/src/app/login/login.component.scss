@@ -2,10 +2,36 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: 2em;
+
+  height: 100%;
+}
+
+h1 {
+  margin: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+
+  img {
+    height: 1.5em;
+  }
 }
 
 .form-container {
   display: flex;
   flex-direction: column;
   gap: 1em;
+  width: 20em;
+
+  button {
+    padding-block: 1em;
+  }
+
+  .error {
+    color: var(--danger);
+    height: 1.4em;
+  }
 }

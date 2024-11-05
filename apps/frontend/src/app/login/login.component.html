@@ -1,5 +1,27 @@
+<h1>
+  <img src="icon.png" alt="App Icon" />
+  Unofficial Actual Dashboard
+</h1>
+
 <div class="form-container">
-  <app-input-field [(value)]="username" label="Username" />
-  <app-input-field type="password" [(value)]="password" label="Password" />
-  <button (click)="doLogin()">Log in</button>
+  <app-input-field [(value)]="username" label="Username" [disabled]="loading()" bulky (submit)="loginButton.click()" />
+  <app-input-field
+    type="password"
+    [(value)]="password"
+    label="Password"
+    [disabled]="loading()"
+    bulky
+    (submit)="loginButton.click()"
+  />
+
+  <div class="error">
+    @if (error()) {
+      These credentials do not match our records.
+    }
+  </div>
+
+  <button (click)="doLogin()" [disabled]="loading()" #loginButton>
+    Log in
+    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+  </button>
 </div>

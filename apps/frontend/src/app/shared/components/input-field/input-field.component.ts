@@ -8,6 +8,8 @@ import {
   InputSignalWithTransform,
   model,
   ModelSignal,
+  output,
+  OutputEmitterRef,
 } from '@angular/core';
 
 @Component({
@@ -26,4 +28,7 @@ export class InputFieldComponent {
 
   readonly clearable: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
   readonly disabled: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
+  readonly bulky: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
+
+  readonly submit: OutputEmitterRef<void> = output<void>();
 }

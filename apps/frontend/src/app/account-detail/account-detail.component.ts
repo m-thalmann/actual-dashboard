@@ -161,6 +161,10 @@ export class AccountDetailComponent implements OnDestroy {
     return detailsLoadingError ?? loadingError;
   });
 
+  constructor() {
+    this.layoutFacade.setShowBackButton(true);
+  }
+
   updatePage(page: number): void {
     this.applyFilterParams({ page: page.toString() });
   }
@@ -183,5 +187,6 @@ export class AccountDetailComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.layoutFacade.setSelectedAccount(undefined);
+    this.layoutFacade.setShowBackButton(false);
   }
 }

@@ -1,7 +1,9 @@
-<button [disabled]="page() <= 1 || disabled()" (click)="prevPage.emit()"><i class="fa-solid fa-arrow-left"></i></button>
+<button class="icon-button" [disabled]="page() <= 1 || disabled()" (click)="prevPage.emit()">
+  <i class="fa-solid fa-arrow-left"></i>
+</button>
 
 <span class="page">{{ totalPages() === 0 ? 0 : page() }} of {{ totalPages() }}</span>
 
-<button [disabled]="page() >= totalPages() || disabled()" (click)="nextPage.emit()">
+<button class="icon-button" [disabled]="page() >= totalPages() || disabled()" (click)="nextPage.emit()">
   <i class="fa-solid fa-arrow-right"></i>
 </button>

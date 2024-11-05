@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, model, ModelSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, model, ModelSignal, signal, WritableSignal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
+import { catchError, firstValueFrom, of } from 'rxjs';
 import { AuthDataService } from '../shared/api/auth-data.service';
 import { AuthService } from '../shared/auth/auth.service';
 import { InputFieldComponent } from '../shared/components/input-field/input-field.component';
@@ -23,8 +23,24 @@ export class LoginComponent {
   readonly username: ModelSignal<string> = model('');
   readonly password: ModelSignal<string> = model('');
 
+  readonly loading: WritableSignal<boolean> = signal(false);
+  readonly error: WritableSignal<boolean> = signal(false);
+
   async doLogin(): Promise<void> {
-    const result = await firstValueFrom(this.authDataService.login(this.username(), this.password()));
+    this.loading.set(true);
+    this.error.set(false);
+
+    const result = await firstValueFrom(
+      this.authDataService.login(this.username(), this.password()).pipe(catchError(() => of(null))),
+    );
+
+    this.loading.set(false);
+
+    if (result === null) {
+      this.error.set(true);
+      return;
+    }
+
     this.authService.login(this.username(), result.data);
 
     const redirectUrl = this.activatedRoute.snapshot.queryParamMap.get('redirect-url') ?? '/';

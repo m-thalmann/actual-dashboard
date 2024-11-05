@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, Signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterOutlet } from '@angular/router';
+import { AuthService } from '../../shared/auth/auth.service';
 import { LayoutFacadeService } from '../layout-facade.service';
 
 @Component({
@@ -12,5 +14,12 @@ import { LayoutFacadeService } from '../layout-facade.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LayoutDefaultComponent {
+  protected readonly authService: AuthService = inject(AuthService);
   readonly layoutFacade: LayoutFacadeService = inject(LayoutFacadeService);
+
+  readonly username: Signal<string | null> = toSignal(this.authService.username$, { requireSync: true });
+
+  doLogout(): void {
+    this.authService.logout();
+  }
 }

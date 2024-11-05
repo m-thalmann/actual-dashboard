@@ -1,7 +1,7 @@
 <header>
   <div class="header-content">
     <div class="left-header">
-      @if (layoutFacade.selectedAccount()) {
+      @if (layoutFacade.showBackButton()) {
         <a routerLink="/" class="back-link">
           <i class="fa-solid fa-arrow-left"></i>
         </a>
@@ -22,6 +22,17 @@
           <div class="title">Unofficial Actual Dashboard</div>
         }
       </h1>
+    </div>
+
+    <div class="header-actions">
+      <span class="user">
+        <i class="fa-solid fa-user"></i>
+        {{ username() }}
+      </span>
+
+      <button class="icon-button" (click)="doLogout()">
+        <i class="fa-solid fa-sign-out"></i>
+      </button>
     </div>
   </div>
 </header>
