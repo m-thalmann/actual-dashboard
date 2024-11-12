@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import * as path from 'path';
 
 import { AccountsModule } from './accounts/accounts.module';
@@ -12,6 +13,10 @@ import { TransactionsModule } from './transactions/transactions.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: path.resolve(__dirname, '.env') }),
+    ServeStaticModule.forRoot({
+      rootPath: path.join(__dirname, 'client'),
+      serveRoot: '/app',
+    }),
     CommonModule,
 
     AccountsModule,

@@ -3,7 +3,7 @@
 ## Dev Setup
 
 1. Install the dependencies: `npm install`
-1. Copy the `.env.example` file to `.env`
+1. Copy the `.env.example` file to `.env` within the `apps/backend` folder
 1. Start a development Actual server using docker: `npm run actual-server`
    - Open the Actual client: http://localhost:5555
    - Set a server password
@@ -19,3 +19,11 @@
 ## Production Build
 
 `npx nx run-many -t build`
+
+## Deploy with Docker
+
+1. Navigate to the `docker` directory
+1. Copy the `.env.docker` file to `.env`
+1. Set the environment variables in the `.env` file
+1. Run the `docker compose up -d` command
+1. Access the dashboard at http://localhost:3000
