@@ -64,6 +64,14 @@ header {
           }
         }
       }
+
+      button.reload-button {
+        &.reloading {
+          i {
+            animation: spin 1s linear infinite;
+          }
+        }
+      }
     }
 
     .header-actions {

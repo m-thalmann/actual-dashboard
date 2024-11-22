@@ -22,6 +22,15 @@
           <div class="title">Unofficial Actual Dashboard</div>
         }
       </h1>
+
+      <button
+        class="icon-button reload-button"
+        [disabled]="reloading()"
+        [class.reloading]="reloading()"
+        (click)="doReload()"
+      >
+        <i class="fa-solid fa-sync"></i>
+      </button>
     </div>
 
     <div class="header-actions">
