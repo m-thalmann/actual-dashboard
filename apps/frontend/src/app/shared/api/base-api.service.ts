@@ -8,6 +8,8 @@ import { PaginationConfig } from '../models/pagination-config';
 export interface RequestOptions {
   pagination?: PaginationConfig;
   filters?: Array<FilterParams>;
+  queryParams?: Record<string, string>;
+  contentType?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -17,31 +19,44 @@ export class BaseApiService {
   private readonly http: HttpClient = inject(HttpClient);
   private readonly apiUrl: string = inject(API_BASE_URL);
 
-  get httpHeaders(): Record<string, Array<string> | string> {
-    return {
-      'Content-Type': 'application/json',
+  protected request<T>(
+    request: HttpRequest<unknown>,
+    options?: RequestOptions,
+    observeResponse?: boolean,
+  ): Observable<HttpResponse<T> | T>;
+  protected request<T>(request: HttpRequest<unknown>, options?: RequestOptions, observeResponse?: false): Observable<T>;
+  protected request<T>(
+    request: HttpRequest<unknown>,
+    options: RequestOptions | undefined,
+    observeResponse: true,
+  ): Observable<HttpResponse<T>>;
+  protected request<T>(
+    request: HttpRequest<unknown>,
+    options?: RequestOptions,
+    observeResponse: boolean = false,
+  ): Observable<HttpResponse<T> | T> {
+    const headers = {
+      'Content-Type': options?.contentType ?? 'application/json',
     };
-  }
-
-  protected request<T>(request: HttpRequest<unknown>, options?: RequestOptions): Observable<T> {
-    const headers = this.httpHeaders;
 
     const params = {
       ...this.generatePaginationParams(options?.pagination),
       ...this.generateFilterParams(options?.filters),
+      ...options?.queryParams,
     };
 
     const finalRequest = request.clone({
       url: `${this.apiUrl}/${request.url}`,
       setParams: params,
       setHeaders: headers,
+      responseType: options?.contentType === undefined ? undefined : 'blob',
     });
 
     return this.http.request<T>(finalRequest).pipe(
       shareReplay({ refCount: true }),
       filter((response): response is HttpResponse<T> => response instanceof HttpResponse),
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      map((response: HttpResponse<T>) => response.body!),
+      map((response: HttpResponse<T>) => (observeResponse ? response : response.body!)),
       first(),
     );
   }
@@ -50,8 +65,20 @@ export class BaseApiService {
     return this.request<T>(new HttpRequest('GET', url), options);
   }
 
-  post<T>(url: string, body: unknown, options?: RequestOptions): Observable<T> {
-    return this.request<T>(new HttpRequest('POST', url, body), options);
+  post<T>(url: string, body: unknown, options?: RequestOptions): Observable<T>;
+  post<T>(
+    url: string,
+    body: unknown,
+    options: RequestOptions | undefined,
+    observeResponse: true,
+  ): Observable<HttpResponse<T>>;
+  post<T>(
+    url: string,
+    body: unknown,
+    options?: RequestOptions,
+    observeResponse?: boolean,
+  ): Observable<HttpResponse<T> | T> {
+    return this.request<T>(new HttpRequest('POST', url, body), options, observeResponse);
   }
 
   protected generateFilterParams(filters?: Array<FilterParams>): Record<string, string> | null {

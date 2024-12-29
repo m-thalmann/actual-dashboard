@@ -1,12 +1,16 @@
 <div class="container">
   <div class="actions">
-    <app-account-detail-filter
-      [accountId]="(accountId$ | async) ?? undefined"
-      [currentFilters]="filters()"
-      [disabled]="loading()"
-      (search)="doSearch($event)"
-      (categoryChange)="changeCategory($event)"
-    />
+    <div class="left-actions">
+      <app-account-detail-filter
+        [accountId]="accountId()"
+        [currentFilters]="filters()"
+        [disabled]="loading()"
+        (search)="doSearch($event)"
+        (categoryChange)="changeCategory($event)"
+      />
+
+      <app-account-detail-export (export)="downloadExport($event.startDate, $event.endDate)" />
+    </div>
 
     <app-pagination
       [page]="page()"

@@ -1,7 +1,16 @@
 import { PaginationMeta } from '@app/shared-types';
-import { Controller, Get, Param, Req } from '@nestjs/common';
-import { ApiBearerAuth, ApiExtraModels, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { Request } from 'express';
+import { Controller, Get, HttpCode, HttpStatus, NotFoundException, Param, Post, Query, Req, Res } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiExtraModels,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiProduces,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
+import { Request, Response } from 'express';
 import { Transaction } from '../common/actual/actual.models';
 import { ActualService } from '../common/actual/actual.service';
 import { buildFilterParams } from '../common/util/filter.utils';
@@ -40,6 +49,40 @@ export class TransactionsController {
       data: transactions,
       meta: buildPaginationMeta(paginationParams, totalAmount),
     };
+  }
+
+  @Post('export')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Export transactions of an account' })
+  @ApiProduces('text/csv')
+  @ApiOkResponse({
+    schema: { type: 'string', example: 'Date,Payee,Notes,Category,Amount' },
+  })
+  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiQuery({ name: 'start-date' })
+  @ApiQuery({ name: 'end-date' })
+  @ApiFilterQueryParams()
+  async export(
+    @Req() request: Request,
+    @Res() response: Response,
+    @Param('id') accountId: string,
+    @Query('start-date') startDate: string,
+    @Query('end-date') endDate: string,
+  ): Promise<Response> {
+    const filterParams = buildFilterParams(request, [['category', 'category.name'], 'notes', 'date']);
+    const csvString = await this.actualService.exportTransactionsCsvString(accountId, {
+      startDate,
+      endDate,
+      filters: filterParams,
+    });
+
+    if (csvString === null) {
+      throw new NotFoundException();
+    }
+
+    response.setHeader('Content-Type', 'text/csv');
+    response.attachment(`actual-export-${accountId}-${startDate}-${endDate}.csv`);
+    return response.send(csvString);
   }
 
   @Get('categories')

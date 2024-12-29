@@ -132,6 +132,42 @@ export class ActualService {
     return queryData.data.map((category) => category.name);
   }
 
+  async exportTransactionsCsvString(
+    accountId: string,
+    options: { startDate: string; endDate: string; filters?: Array<FilterParams> },
+  ): Promise<string | null> {
+    if (!this.isAllowedAccount(accountId)) {
+      return null;
+    }
+
+    const query = this.applyFilters(
+      q('transactions')
+        .filter({ account: { $eq: accountId } })
+        .select(['notes', 'amount', { payee: 'payee.name' }, 'date', { category: 'category.name' }]),
+      [
+        {
+          property: 'date',
+          type: 'gte',
+          value: options.startDate,
+        },
+        {
+          property: 'date',
+          type: 'lte',
+          value: options.endDate,
+        },
+        ...(options.filters ?? []),
+      ],
+    );
+
+    const transactions = await this.runQuery<Array<Transaction>>(query);
+
+    const header = ['Date', 'Payee', 'Notes', 'Category', 'Amount'].join(',');
+
+    const rows = transactions.map((row) => [row.date, row.payee, row.notes, row.category, row.amount].join(','));
+
+    return [header, ...rows].join('\n');
+  }
+
   async destroy(): Promise<void> {
     await shutdown();
   }
@@ -153,6 +189,10 @@ export class ActualService {
           return acc.filter({ [filter.property]: { $eq: filter.value } });
         case 'like':
           return acc.filter({ [filter.property]: { $like: filter.value } });
+        case 'gte':
+          return acc.filter({ [filter.property]: { $gte: filter.value } });
+        case 'lte':
+          return acc.filter({ [filter.property]: { $lte: filter.value } });
         default:
           return acc;
       }

@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Redirect } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
 import { Public } from './common/util/auth.utils';
 
@@ -7,7 +7,8 @@ import { Public } from './common/util/auth.utils';
 export class AppController {
   @Get()
   @Public()
-  getMessage(): { message: string } {
-    return { message: 'Unofficial Actual Rest API' };
+  @Redirect('app')
+  redirectToApp(): void {
+    // redirect
   }
 }

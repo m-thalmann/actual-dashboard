@@ -39,7 +39,7 @@ async function bootstrap(): Promise<void> {
   // TODO: handle when remote budget cant be loaded
   await actualService.init();
 
-  app.enableCors();
+  app.enableCors({ exposedHeaders: ['Content-Disposition'] });
   app.setGlobalPrefix(basePath);
 
   const serverUrl = `http://localhost:${port}${basePath}`;

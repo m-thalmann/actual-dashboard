@@ -1,0 +1,25 @@
+:host {
+  display: block;
+}
+
+div {
+  display: flex;
+  align-items: end;
+  gap: 1em;
+}
+
+.expanded {
+  position: relative;
+  &::before {
+    position: absolute;
+    top: -0.5em;
+    left: -0.5em;
+    right: -0.5em;
+    bottom: -0.5em;
+    background: var(--foreground);
+    opacity: 0.05;
+    content: '';
+    z-index: -1;
+    border-radius: 0.25em;
+  }
+}

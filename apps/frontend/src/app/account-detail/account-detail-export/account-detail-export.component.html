@@ -1,0 +1,12 @@
+<div [class.expanded]="showExportActions()">
+  <button (click)="toggleExportActions()">Export</button>
+  @if (showExportActions()) {
+    <div>
+      <app-input-field label="Start data" type="date" #startDate />
+      <app-input-field label="End date" type="date" #endDate />
+      <button (click)="downloadExport(startDate.value(), endDate.value())" class="icon-button">
+        <i class="fa-solid fa-download"></i>
+      </button>
+    </div>
+  }
+</div>

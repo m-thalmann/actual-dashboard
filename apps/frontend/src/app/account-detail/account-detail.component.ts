@@ -1,4 +1,4 @@
-import { AsyncPipe, CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -31,14 +31,13 @@ import { LayoutFacadeService } from '../layouts/layout-facade.service';
 import { AccountsDataService } from '../shared/api/accounts-data.service';
 import { TransactionsDataService } from '../shared/api/transactions-data.service';
 import { ErrorDisplayComponent } from '../shared/components/error-display/error-display.component';
-import { InputFieldComponent } from '../shared/components/input-field/input-field.component';
 import { LoadingSpinnerComponent } from '../shared/components/loading-spinner/loading-spinner.component';
 import { PaginationComponent } from '../shared/components/pagination/pagination.component';
-import { SelectFieldComponent } from '../shared/components/select-field/select-field.component';
 import { Account } from '../shared/models/account';
 import { ApiResponseWithMeta } from '../shared/models/api-response';
 import { PaginationMeta } from '../shared/models/pagination-meta';
 import { Transaction } from '../shared/models/transaction';
+import { AccountDetailExportComponent } from './account-detail-export/account-detail-export.component';
 import { AccountDetailFilterComponent } from './account-detail-filter/account-detail-filter.component';
 import { TransactionsTableComponent } from './transactions-table/transactions-table.component';
 
@@ -47,14 +46,12 @@ import { TransactionsTableComponent } from './transactions-table/transactions-ta
   standalone: true,
   imports: [
     CommonModule,
-    AsyncPipe,
     PaginationComponent,
-    InputFieldComponent,
-    SelectFieldComponent,
     TransactionsTableComponent,
     AccountDetailFilterComponent,
     ErrorDisplayComponent,
     LoadingSpinnerComponent,
+    AccountDetailExportComponent,
   ],
   templateUrl: './account-detail.component.html',
   styleUrl: './account-detail.component.scss',
@@ -75,6 +72,8 @@ export class AccountDetailComponent implements OnDestroy {
       refCount: true,
     }),
   );
+
+  readonly accountId: Signal<string | undefined> = toSignal(this.accountId$);
 
   protected readonly accountDetails$: Observable<Account> = this.accountId$.pipe(
     switchMap((id) => this.accountsDataService.getAccountDetails(id)),
@@ -175,6 +174,14 @@ export class AccountDetailComponent implements OnDestroy {
 
   changeCategory(category: string | null): void {
     this.applyFilterParams({ category });
+  }
+
+  downloadExport(startDate: string, endDate: string): void {
+    const accountId = this.accountId();
+    if (accountId === undefined) {
+      return;
+    }
+    this.transactionsDataService.downloadExport(accountId, { startDate, endDate, filters: this.filters() });
   }
 
   private applyFilterParams(params: Record<string, string | null>, resetPage: boolean = true): void {
