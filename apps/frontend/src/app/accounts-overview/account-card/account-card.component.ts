@@ -5,7 +5,6 @@ import { Account } from '../../shared/models/account';
 
 @Component({
   selector: 'app-account-card',
-  standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './account-card.component.html',
   styleUrl: './account-card.component.scss',

@@ -60,9 +60,7 @@ describe('BaseApiService', () => {
       const req = httpTesting.expectOne(`${MOCK_API_BASE_URL}/${request.url}`);
       expect(req.request.method).toBe('GET');
 
-      Object.entries(service.httpHeaders).forEach(([key, value]) => {
-        expect(req.request.headers.get(key)).toBe(value);
-      });
+      expect(req.request.headers.get('Content-Type')).toBe('application/json');
 
       req.flush(response);
       const result = await resultPromise;
@@ -135,9 +133,8 @@ describe('BaseApiService', () => {
       );
       expect(req.request.method).toBe('GET');
 
-      Object.entries(service.httpHeaders).forEach(([key, value]) => {
-        expect(req.request.headers.get(key)).toBe(value);
-      });
+      expect(req.request.headers.get('Content-Type')).toBe('application/json');
+
       requestHeaders.keys().forEach((key) => {
         expect(req.request.headers.get(key)).toBe(requestHeaders.get(key));
       });

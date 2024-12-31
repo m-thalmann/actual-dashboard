@@ -88,7 +88,6 @@ describe('LoginComponent', () => {
       await component.doLogin();
 
       expect(mockRouter.navigateByUrl).toHaveBeenCalledWith(expectedRedirectUrl);
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockActivatedRoute.snapshot?.queryParamMap.get).toHaveBeenCalledWith('redirect-url');
     });
 

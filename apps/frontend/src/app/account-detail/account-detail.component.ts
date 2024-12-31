@@ -43,7 +43,6 @@ import { TransactionsTableComponent } from './transactions-table/transactions-ta
 
 @Component({
   selector: 'app-account-detail',
-  standalone: true,
   imports: [
     CommonModule,
     PaginationComponent,
@@ -85,7 +84,7 @@ export class AccountDetailComponent implements OnDestroy {
   readonly detailsLoadingError: Signal<Error | undefined> = toSignal(
     this.accountDetails$.pipe(
       switchMap(() => EMPTY),
-      catchError((error: Error) => of(error)),
+      catchError((error: unknown) => of(error as Error)),
     ),
   );
 
@@ -144,7 +143,7 @@ export class AccountDetailComponent implements OnDestroy {
   readonly loadingError: Signal<Error | undefined> = toSignal(
     this.transactions$.pipe(
       switchMap(() => EMPTY),
-      catchError((error: Error) => of(error)),
+      catchError((error: unknown) => of(error as Error)),
       tap(() => this.loading.set(false)),
     ),
   );

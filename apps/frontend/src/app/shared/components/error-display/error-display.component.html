@@ -15,14 +15,14 @@
       @switch (type()) {
         @case ('not-found') {
           @if (notFoundMessageTemplate(); as notFoundMessageTemplate) {
-            <ng-container *ngTemplateOutlet="notFoundMessageTemplate"></ng-container>
+            <ng-container *ngTemplateOutlet="notFoundMessageTemplate" />
           } @else {
             Not found!
           }
         }
         @default {
           @if (errorMessageTemplate(); as errorMessageTemplate) {
-            <ng-container *ngTemplateOutlet="errorMessageTemplate"></ng-container>
+            <ng-container *ngTemplateOutlet="errorMessageTemplate" />
           } @else {
             An error occurred!
           }

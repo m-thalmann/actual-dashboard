@@ -10,7 +10,6 @@ import { AccountCardComponent } from './account-card/account-card.component';
 
 @Component({
   selector: 'app-accounts-overview',
-  standalone: true,
   imports: [CommonModule, AccountCardComponent, ErrorDisplayComponent, LoadingSpinnerComponent],
   templateUrl: './accounts-overview.component.html',
   styleUrl: './accounts-overview.component.scss',
@@ -29,7 +28,7 @@ export class AccountsOverviewComponent {
   readonly loadingError: Signal<Error | undefined> = toSignal(
     this.accounts$.pipe(
       switchMap(() => EMPTY),
-      catchError((error: Error) => of(error)),
+      catchError((error: unknown) => of(error as Error)),
       tap(() => this.loading.set(false)),
     ),
   );

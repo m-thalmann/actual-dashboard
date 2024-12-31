@@ -7,6 +7,6 @@ export class GeneralDataService {
   private readonly baseApiService: BaseApiService = inject(BaseApiService);
 
   reload(): Observable<void> {
-    return this.baseApiService.post<void>(`general/reload`, {});
+    return this.baseApiService.post<undefined>(`general/reload`, {});
   }
 }

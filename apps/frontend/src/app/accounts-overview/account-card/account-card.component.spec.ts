@@ -1,5 +1,5 @@
-import { formatCurrency, getCurrencySymbol } from '@angular/common';
-import { DEFAULT_CURRENCY_CODE, LOCALE_ID } from '@angular/core';
+import { formatCurrency } from '@angular/common';
+import { LOCALE_ID } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { AccountCardComponent } from './account-card.component';
@@ -32,8 +32,7 @@ describe('AccountCardComponent', () => {
 
     localeId = TestBed.inject(LOCALE_ID);
 
-    const defaultCurrencyCode = TestBed.inject(DEFAULT_CURRENCY_CODE);
-    currency = getCurrencySymbol(defaultCurrencyCode, 'narrow');
+    currency = '$';
   });
 
   it('should create', () => {

@@ -8,7 +8,6 @@ import { InputFieldComponent } from '../shared/components/input-field/input-fiel
 
 @Component({
   selector: 'app-login',
-  standalone: true,
   imports: [CommonModule, InputFieldComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',

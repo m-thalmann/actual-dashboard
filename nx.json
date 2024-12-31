@@ -56,5 +56,6 @@
       "standalone": true,
       "nameAndDirectoryFormat": "derived"
     }
-  }
+  },
+  "useLegacyCache": true
 }

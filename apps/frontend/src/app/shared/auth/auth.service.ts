@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { BehaviorSubject, distinctUntilChanged, map, Observable, skip } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, map, Observable, skip, tap } from 'rxjs';
 
 export interface AuthData {
   token: string;
@@ -38,16 +38,22 @@ export class AuthService {
       distinctUntilChanged(),
     );
 
-    this.authData$.pipe(skip(1), takeUntilDestroyed()).subscribe((data) => {
-      if (data === null) {
-        localStorage.removeItem(AuthService.TOKEN_STORAGE_KEY);
-        localStorage.removeItem(AuthService.USERNAME_STORAGE_KEY);
-        return;
-      }
+    this.authData$
+      .pipe(
+        skip(1),
+        tap((data) => {
+          if (data === null) {
+            localStorage.removeItem(AuthService.TOKEN_STORAGE_KEY);
+            localStorage.removeItem(AuthService.USERNAME_STORAGE_KEY);
+            return;
+          }
 
-      localStorage.setItem(AuthService.TOKEN_STORAGE_KEY, data.token);
-      localStorage.setItem(AuthService.USERNAME_STORAGE_KEY, data.username);
-    });
+          localStorage.setItem(AuthService.TOKEN_STORAGE_KEY, data.token);
+          localStorage.setItem(AuthService.USERNAME_STORAGE_KEY, data.username);
+        }),
+        takeUntilDestroyed(),
+      )
+      .subscribe();
   }
 
   getToken(): string | null {

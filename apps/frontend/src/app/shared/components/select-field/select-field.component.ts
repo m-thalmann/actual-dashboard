@@ -20,7 +20,6 @@ type TrackByFn<T> = (value: T) => unknown;
 
 @Component({
   selector: 'app-select-field',
-  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './select-field.component.html',
   styleUrl: './select-field.component.scss',

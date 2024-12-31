@@ -1,16 +1,16 @@
 <app-input-field
-  [value]="filters().search"
   label="Search"
   placeholder="Notes"
+  clearable
+  [value]="filters().search"
   [disabled]="disabled()"
   (valueChange)="doSearch($event)"
-  clearable
 />
 
 <app-select-field
+  label="Category"
   [value]="filters().category"
   [options]="categoryOptions()"
-  label="Category"
   [disabled]="disabled() || categoriesLoading() || categoriesLoadingError() !== undefined"
   (valueChange)="changeCategory($event)"
 />

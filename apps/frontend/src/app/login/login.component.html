@@ -4,14 +4,20 @@
 </h1>
 
 <div class="form-container">
-  <app-input-field [(value)]="username" label="Username" [disabled]="loading()" bulky (submit)="loginButton.click()" />
+  <app-input-field
+    label="Username"
+    bulky
+    [disabled]="loading()"
+    [(value)]="username"
+    (submitted)="loginButton.click()"
+  />
   <app-input-field
     type="password"
-    [(value)]="password"
     label="Password"
-    [disabled]="loading()"
     bulky
-    (submit)="loginButton.click()"
+    [disabled]="loading()"
+    [(value)]="password"
+    (submitted)="loginButton.click()"
   />
 
   <div class="error">
@@ -20,7 +26,7 @@
     }
   </div>
 
-  <button (click)="doLogin()" [disabled]="loading()" #loginButton>
+  <button #loginButton [disabled]="loading()" (click)="doLogin()">
     Log in
     <i class="fa-solid fa-arrow-right-to-bracket"></i>
   </button>

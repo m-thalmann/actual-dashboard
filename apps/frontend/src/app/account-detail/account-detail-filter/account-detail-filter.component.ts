@@ -23,7 +23,6 @@ import { SelectFieldComponent, SelectFieldOption } from '../../shared/components
 
 @Component({
   selector: 'app-account-detail-filter',
-  standalone: true,
   imports: [CommonModule, InputFieldComponent, SelectFieldComponent],
   templateUrl: './account-detail-filter.component.html',
   styleUrl: './account-detail-filter.component.scss',
@@ -58,7 +57,7 @@ export class AccountDetailFilterComponent {
   readonly categoriesLoadingError: Signal<Error | undefined> = toSignal(
     this.categories$.pipe(
       switchMap(() => EMPTY),
-      catchError((error: Error) => of(error)),
+      catchError((error: unknown) => of(error as Error)),
       tap(() => this.categoriesLoading.set(false)),
     ),
   );

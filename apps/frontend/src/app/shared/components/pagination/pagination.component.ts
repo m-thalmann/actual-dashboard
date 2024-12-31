@@ -12,7 +12,6 @@ import {
 
 @Component({
   selector: 'app-pagination',
-  standalone: true,
   imports: [CommonModule],
   templateUrl: './pagination.component.html',
   styleUrl: './pagination.component.scss',
@@ -23,6 +22,6 @@ export class PaginationComponent {
   readonly totalPages: InputSignal<number> = input.required<number>();
   readonly disabled: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
 
-  readonly prevPage: OutputEmitterRef<void> = output<void>();
-  readonly nextPage: OutputEmitterRef<void> = output<void>();
+  readonly prevPage: OutputEmitterRef<void> = output();
+  readonly nextPage: OutputEmitterRef<void> = output();
 }

@@ -5,7 +5,7 @@ export function isSimpleFilter(filter: unknown): filter is string {
   return typeof filter === 'string';
 }
 
-export function isComplexFilter<T extends FilterType>(filter: unknown): filter is { [key in T]: string } {
+export function isComplexFilter<T extends FilterType>(filter: unknown): filter is Record<T, string> {
   if (filter === null || typeof filter !== 'object') {
     return false;
   }

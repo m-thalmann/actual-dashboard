@@ -12,7 +12,6 @@ import { Transaction } from '../../shared/models/transaction';
 
 @Component({
   selector: 'app-transactions-table',
-  standalone: true,
   imports: [CommonModule, LoadingSpinnerComponent],
   templateUrl: './transactions-table.component.html',
   styleUrl: './transactions-table.component.scss',

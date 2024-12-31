@@ -11,7 +11,6 @@ export const RELOAD_ANIMATION_DURATION = 250;
 
 @Component({
   selector: 'app-layout-default',
-  standalone: true,
   imports: [CommonModule, RouterOutlet, RouterLink],
   templateUrl: './layout-default.component.html',
   styleUrl: './layout-default.component.scss',

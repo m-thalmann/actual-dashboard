@@ -13,7 +13,6 @@ import {
 
 @Component({
   selector: 'app-error-display',
-  standalone: true,
   imports: [CommonModule],
   templateUrl: './error-display.component.html',
   styleUrl: './error-display.component.scss',

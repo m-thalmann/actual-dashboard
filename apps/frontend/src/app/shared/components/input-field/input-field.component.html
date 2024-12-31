@@ -10,13 +10,13 @@
 
   <div class="input-container">
     <input
+      #inputElement
       [type]="type()"
       [value]="value()"
       [placeholder]="placeholder()"
       [disabled]="disabled()"
       (change)="value.set(inputElement.value)"
       (keyup.enter)="submit.emit()"
-      #inputElement
     />
 
     @if (clearable()) {

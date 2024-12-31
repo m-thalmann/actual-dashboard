@@ -4,7 +4,6 @@ import { InputFieldComponent } from '../../shared/components/input-field/input-f
 
 @Component({
   selector: 'app-account-detail-export',
-  standalone: true,
   imports: [CommonModule, InputFieldComponent],
   templateUrl: './account-detail-export.component.html',
   styleUrl: './account-detail-export.component.scss',

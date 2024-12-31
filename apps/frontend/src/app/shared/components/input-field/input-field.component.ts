@@ -14,7 +14,6 @@ import {
 
 @Component({
   selector: 'app-input-field',
-  standalone: true,
   imports: [CommonModule],
   templateUrl: './input-field.component.html',
   styleUrl: './input-field.component.scss',
@@ -30,5 +29,5 @@ export class InputFieldComponent {
   readonly disabled: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
   readonly bulky: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
 
-  readonly submit: OutputEmitterRef<void> = output<void>();
+  readonly submitted: OutputEmitterRef<void> = output();
 }
