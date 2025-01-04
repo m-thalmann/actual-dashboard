@@ -16,7 +16,7 @@
       [placeholder]="placeholder()"
       [disabled]="disabled()"
       (change)="value.set(inputElement.value)"
-      (keyup.enter)="submit.emit()"
+      (keyup.enter)="submitted.emit()"
     />
 
     @if (clearable()) {
