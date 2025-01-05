@@ -1,5 +1,4 @@
 import { downloadBudget, init, q, runQuery, shutdown, sync } from '@actual-app/api';
-import { Query } from '@actual-app/api/@types/loot-core/shared/query';
 import { FilterParams } from '@app/shared-types';
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -8,6 +7,9 @@ import { CashFlowEntry } from '../../transactions/dto/cash-flow-entry.dto';
 import { getDatesBetween, getDateString } from '../util/date.utils';
 import { PaginationParams } from '../util/pagination.utils';
 import { Account, Transaction } from './actual.models';
+
+// workaround for the missing types in the actual-app/api package
+type Query = ReturnType<typeof q>;
 
 // TODO: document why this path is correct and maybe move some place else
 const DATA_DIR = path.resolve(__dirname, 'data');
