@@ -15,7 +15,7 @@
             {{ selectedAccount.name }}
 
             <div class="amount" [class.amount-negative]="selectedAccount.amount < 0">
-              {{ selectedAccount.amount / 100 | currency }}
+              {{ selectedAccount.amount | money }}
             </div>
           </div>
         } @else {

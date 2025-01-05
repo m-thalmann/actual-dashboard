@@ -1,9 +1,22 @@
 <div class="actions">
-  <app-input-field #startDate label="Start date" type="date" />
-  <app-input-field #endDate label="End date" type="date" />
+  <app-input-field
+    #startDate
+    label="Start date"
+    type="date"
+    [disabled]="loading()"
+    (valueChange)="updateTimeRange(startDate.value(), endDate.value())"
+  />
+  <app-input-field
+    #endDate
+    label="End date"
+    type="date"
+    [disabled]="loading()"
+    (valueChange)="updateTimeRange(startDate.value(), endDate.value())"
+  />
 </div>
 
 <app-cash-flow-graph
-  [timeRange]="{ startDate: startDate.value(), endDate: endDate.value() }"
+  [timeRange]="selectedTimeRange()"
   [accountId]="accountId()"
+  (loadingChanged)="cashFlowGraphLoading.set($event)"
 />

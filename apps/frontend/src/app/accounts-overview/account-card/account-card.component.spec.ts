@@ -1,5 +1,4 @@
 import { formatCurrency } from '@angular/common';
-import { LOCALE_ID } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { AccountCardComponent } from './account-card.component';
@@ -14,9 +13,6 @@ describe('AccountCardComponent', () => {
   let component: AccountCardComponent;
   let fixture: ComponentFixture<AccountCardComponent>;
 
-  let localeId: string;
-  let currency: string;
-
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AccountCardComponent],
@@ -29,10 +25,6 @@ describe('AccountCardComponent', () => {
     fixture.componentRef.setInput('account', mockAccount);
 
     fixture.detectChanges();
-
-    localeId = TestBed.inject(LOCALE_ID);
-
-    currency = '$';
   });
 
   it('should create', () => {
@@ -44,6 +36,6 @@ describe('AccountCardComponent', () => {
 
     expect(element.innerHTML).toContain(mockAccount.id);
     expect(element.innerHTML).toContain(mockAccount.name);
-    expect(element.innerHTML).toContain(formatCurrency(mockAccount.amount / 100, localeId, currency));
+    expect(element.innerHTML).toContain(formatCurrency(mockAccount.amount / 100, 'en-US', ''));
   });
 });

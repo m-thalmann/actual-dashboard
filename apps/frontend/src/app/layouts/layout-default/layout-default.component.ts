@@ -5,13 +5,14 @@ import { RouterLink, RouterOutlet } from '@angular/router';
 import { delay, tap } from 'rxjs';
 import { GeneralDataService } from '../../shared/api/general-data.service';
 import { AuthService } from '../../shared/auth/auth.service';
+import { MoneyPipe } from '../../shared/pipes/money.pipe';
 import { LayoutFacadeService } from '../layout-facade.service';
 
 export const RELOAD_ANIMATION_DURATION = 250;
 
 @Component({
   selector: 'app-layout-default',
-  imports: [CommonModule, RouterOutlet, RouterLink],
+  imports: [CommonModule, RouterOutlet, RouterLink, MoneyPipe],
   templateUrl: './layout-default.component.html',
   styleUrl: './layout-default.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -4,7 +4,7 @@
   <span class="content">
     <span class="name">{{ account().name }}</span>
     <span class="amount" [class.positive]="account().amount > 0" [class.negative]="account().amount < 0">
-      {{ account().amount / 100 | currency }}
+      {{ account().amount | money }}
     </span>
   </span>
 </a>

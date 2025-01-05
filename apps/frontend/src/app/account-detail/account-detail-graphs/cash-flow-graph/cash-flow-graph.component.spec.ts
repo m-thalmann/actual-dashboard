@@ -1,7 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import Chart from 'chart.js/auto';
 import { of } from 'rxjs';
 import { TransactionsDataService } from '../../../shared/api/transactions-data.service';
 import { CashFlowGraphComponent } from './cash-flow-graph.component';
+
+jest.mock('chart.js/auto', () =>
+  jest.fn().mockImplementation(() => ({
+    destroy: jest.fn(),
+    update: jest.fn(),
+    data: {
+      labels: [],
+      datasets: [{ data: [] }, { data: [] }],
+    },
+  })),
+);
 
 describe('CashFlowGraphComponent', () => {
   let component: CashFlowGraphComponent;
@@ -9,6 +21,8 @@ describe('CashFlowGraphComponent', () => {
   let mockTransactionsDataService: Partial<TransactionsDataService>;
 
   beforeEach(async () => {
+    (Chart as unknown as jest.Mock).mockClear();
+
     mockTransactionsDataService = {
       getCashFlow: jest.fn().mockReturnValue(of({ data: [] })),
     };

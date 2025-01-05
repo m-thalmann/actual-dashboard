@@ -19,12 +19,12 @@
         <td>{{ transaction.category }}</td>
         <td class="right">
           @if (transaction.amount < 0) {
-            {{ transaction.amount / 100 | currency }}
+            {{ transaction.amount | money }}
           }
         </td>
         <td class="right">
           @if (transaction.amount > 0) {
-            {{ transaction.amount / 100 | currency }}
+            {{ transaction.amount | money }}
           }
         </td>
       </tr>

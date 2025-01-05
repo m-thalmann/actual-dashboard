@@ -1,6 +1,18 @@
 <app-card>
   <h2>Cash Flow</h2>
   <div>
-    <canvas #graph height="500px"></canvas>
+    <canvas #chart height="500px"></canvas>
   </div>
 </app-card>
+
+@if (loading() || timeRange() === undefined || loadingError() !== undefined) {
+  <div class="disabled-overlay">
+    @if (loadingError() !== undefined) {
+      <app-error-display [error]="loadingError()" />
+    } @else if (loading()) {
+      <app-loading-spinner />
+    } @else if (timeRange() === undefined) {
+      <p>Select a time range to view graph.</p>
+    }
+  </div>
+}

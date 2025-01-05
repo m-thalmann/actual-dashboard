@@ -1,5 +1,5 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { ApplicationConfig, DEFAULT_CURRENCY_CODE, InjectionToken, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, InjectionToken, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { environment } from '../environments/environment';
 import { appRoutes } from './app.routes';
@@ -13,7 +13,6 @@ export const appConfig: ApplicationConfig = {
     provideRouter(appRoutes),
     provideHttpClient(withInterceptors([authInterceptor])),
 
-    { provide: DEFAULT_CURRENCY_CODE, useValue: 'EUR' },
     { provide: API_BASE_URL, useValue: environment.apiBaseUrl },
   ],
 };

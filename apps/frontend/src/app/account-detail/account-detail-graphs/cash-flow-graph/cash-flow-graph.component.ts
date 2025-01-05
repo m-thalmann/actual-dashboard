@@ -7,6 +7,9 @@ import {
   inject,
   input,
   InputSignal,
+  OnDestroy,
+  output,
+  OutputEmitterRef,
   signal,
   Signal,
   viewChild,
@@ -14,59 +17,81 @@ import {
 } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import Chart from 'chart.js/auto';
-import { combineLatest, filter, map, Observable, shareReplay, switchMap } from 'rxjs';
+import { catchError, combineLatest, EMPTY, filter, map, Observable, of, shareReplay, switchMap, tap } from 'rxjs';
 import { TransactionsDataService } from '../../../shared/api/transactions-data.service';
 import { CardComponent } from '../../../shared/components/card/card.component';
+import { ErrorDisplayComponent } from '../../../shared/components/error-display/error-display.component';
+import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { CashFlowEntry } from '../../../shared/models/cash-flow-entry';
 import { TimeRange } from '../../../shared/models/time-range';
 
 @Component({
   selector: 'app-cash-flow-graph',
-  imports: [CommonModule, CardComponent],
+  imports: [CommonModule, CardComponent, LoadingSpinnerComponent, ErrorDisplayComponent],
   templateUrl: './cash-flow-graph.component.html',
   styleUrl: './cash-flow-graph.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CashFlowGraphComponent {
+export class CashFlowGraphComponent implements OnDestroy {
   private readonly transactionDataService: TransactionsDataService = inject(TransactionsDataService);
 
   readonly accountId: InputSignal<string> = input.required<string>();
-  readonly timeRange: InputSignal<TimeRange> = input.required<TimeRange>();
+  readonly timeRange: InputSignal<TimeRange | undefined> = input.required<TimeRange | undefined>();
+
+  readonly loadingChanged: OutputEmitterRef<boolean> = output<boolean>();
+
   readonly accountId$: Observable<string> = toObservable(this.accountId);
-  readonly timeRange$: Observable<TimeRange> = toObservable(this.timeRange);
-  //TODO: no time range selected handling
+  readonly timeRange$: Observable<TimeRange> = toObservable(this.timeRange).pipe(
+    filter((timeRange): timeRange is TimeRange => timeRange !== undefined),
+  );
 
-  protected readonly canvasGraph: Signal<ElementRef<HTMLCanvasElement>> = viewChild.required('graph');
+  protected readonly chartCanvas: Signal<ElementRef<HTMLCanvasElement>> = viewChild.required('chart');
 
-  //TODO: add error handling
-  //TODO: add loading
+  readonly loading: WritableSignal<boolean> = signal(false);
+
   protected readonly entries$: Observable<Array<CashFlowEntry>> = combineLatest([
     this.accountId$,
     this.timeRange$,
   ]).pipe(
-    filter(([, timeRange]) => timeRange.endDate.length > 0 && timeRange.startDate.length > 0),
+    tap(() => this.loading.set(true)),
     switchMap(([accountId, timeRange]) => this.transactionDataService.getCashFlow(accountId, timeRange)),
     map((apiResponse) => apiResponse.data),
+    tap(() => this.loading.set(false)),
     shareReplay({
       refCount: true,
       bufferSize: 1,
     }),
   );
-  protected readonly entries: Signal<Array<CashFlowEntry> | undefined> = toSignal(this.entries$);
+  protected readonly entries: Signal<Array<CashFlowEntry> | undefined> = toSignal(this.entries$, {
+    rejectErrors: true,
+  });
 
-  protected readonly graph: WritableSignal<Chart | undefined> = signal<Chart | undefined>(undefined);
+  readonly loadingError: Signal<Error | undefined> = toSignal(
+    this.entries$.pipe(
+      switchMap(() => EMPTY),
+      catchError((error: unknown) => of(error as Error)),
+      tap(() => this.loading.set(false)),
+    ),
+  );
+
+  protected readonly chart: WritableSignal<Chart | undefined> = signal<Chart | undefined>(undefined);
 
   constructor() {
     effect(() => {
-      const canvas = this.canvasGraph();
-
-      this.buildGraph(canvas.nativeElement);
+      this.loadingChanged.emit(this.loading());
     });
+
+    effect(() => {
+      const canvas = this.chartCanvas();
+
+      this.buildChart(canvas.nativeElement);
+    });
+
     effect(() => {
       const entries = this.entries();
-      const graph = this.graph();
+      const chart = this.chart();
 
-      if (entries === undefined || graph === undefined) {
+      if (entries === undefined || chart === undefined) {
         return;
       }
 
@@ -74,18 +99,18 @@ export class CashFlowGraphComponent {
       const deposits = entries.map((item) => item.deposit / 100);
       const payments = entries.map((item) => item.payment / 100);
 
-      graph.data.labels = labels;
-      graph.data.datasets[0].data = deposits;
-      graph.data.datasets[1].data = payments;
+      chart.data.labels = labels;
+      chart.data.datasets[0].data = deposits;
+      chart.data.datasets[1].data = payments;
 
-      graph.update();
+      chart.update();
     });
   }
 
-  protected buildGraph(canvas: HTMLCanvasElement): void {
+  protected buildChart(canvas: HTMLCanvasElement): void {
     const color = 'white';
 
-    const graph = new Chart(canvas, {
+    const chart = new Chart(canvas, {
       type: 'bar',
       data: {
         labels: [],
@@ -134,6 +159,10 @@ export class CashFlowGraphComponent {
       },
     });
 
-    this.graph.set(graph);
+    this.chart.set(chart);
+  }
+
+  ngOnDestroy(): void {
+    this.chart()?.destroy();
   }
 }

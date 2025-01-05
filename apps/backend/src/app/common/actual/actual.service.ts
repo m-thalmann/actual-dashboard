@@ -225,7 +225,7 @@ export class ActualService {
 
     const header = ['Date', 'Payee', 'Notes', 'Category', 'Amount'].join(',');
 
-    const rows = transactions.map((row) => [row.date, row.payee, row.notes, row.category, row.amount].join(','));
+    const rows = transactions.map((row) => [row.date, row.payee, row.notes, row.category, row.amount / 100].join(','));
 
     return [header, ...rows].join('\n');
   }
