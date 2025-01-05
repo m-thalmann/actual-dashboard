@@ -1,0 +1,9 @@
+<div class="actions">
+  <app-input-field #startDate label="Start date" type="date" />
+  <app-input-field #endDate label="End date" type="date" />
+</div>
+
+<app-cash-flow-graph
+  [timeRange]="{ startDate: startDate.value(), endDate: endDate.value() }"
+  [accountId]="accountId()"
+/>

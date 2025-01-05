@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
-import { TransactionsDataService } from '../../shared/api/transactions-data.service';
+import { TransactionsDataService } from '../../../shared/api/transactions-data.service';
 import { AccountDetailFilterComponent } from './account-detail-filter.component';
 
 describe('AccountDetailFilterComponent', () => {

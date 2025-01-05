@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, output, OutputEmitterRef, signal, WritableSignal } from '@angular/core';
-import { InputFieldComponent } from '../../shared/components/input-field/input-field.component';
+import { InputFieldComponent } from '../../../shared/components/input-field/input-field.component';
 
 @Component({
   selector: 'app-account-detail-export',

@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { FilterParams } from '@app/shared-types';
 import { Observable, tap } from 'rxjs';
 import { ApiResponse, ApiResponseWithMeta } from '../models/api-response';
+import { CashFlowEntry } from '../models/cash-flow-entry';
 import { PaginationConfig } from '../models/pagination-config';
 import { PaginationMeta } from '../models/pagination-meta';
 import { Transaction } from '../models/transaction';
@@ -23,6 +24,15 @@ export class TransactionsDataService {
 
   getCategories(accountId: string): Observable<ApiResponse<Array<string | null>>> {
     return this.baseApiService.get<ApiResponse<Array<string | null>>>(`accounts/${accountId}/transactions/categories`);
+  }
+
+  getCashFlow(
+    accountId: string,
+    options: { startDate: string; endDate: string },
+  ): Observable<ApiResponse<Array<CashFlowEntry>>> {
+    return this.baseApiService.get<ApiResponse<Array<CashFlowEntry>>>(`accounts/${accountId}/transactions/cash-flow`, {
+      queryParams: { 'start-date': options.startDate, 'end-date': options.endDate },
+    });
   }
 
   downloadExport(

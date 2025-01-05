@@ -1,8 +1,8 @@
 <header>
   <div class="header-content">
     <div class="left-header">
-      @if (layoutFacade.showBackButton()) {
-        <a routerLink="/" class="back-link">
+      @if (layoutFacade.backButtonUrl(); as url) {
+        <a class="back-link" [routerLink]="url">
           <i class="fa-solid fa-arrow-left"></i>
         </a>
       }

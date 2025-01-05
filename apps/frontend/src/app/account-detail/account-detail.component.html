@@ -1,33 +1,36 @@
 <div class="container">
   <div class="actions">
-    <div class="left-actions">
-      <app-account-detail-filter
-        [accountId]="accountId()"
-        [currentFilters]="filters()"
-        [disabled]="loading()"
-        (search)="doSearch($event)"
-        (categoryChange)="changeCategory($event)"
-      />
-
-      <app-account-detail-export (export)="downloadExport($event.startDate, $event.endDate)" />
-    </div>
-
-    <app-pagination
-      [page]="page()"
-      [totalPages]="transactions()?.meta?.lastPage ?? 0"
-      [disabled]="loading()"
-      (prevPage)="updatePage(page() - 1)"
-      (nextPage)="updatePage(page() + 1)"
-    />
+    @switch (view()) {
+      @case ('transactions') {
+        <a class="button" queryParamsHandling="merge" [routerLink]="[]" [queryParams]="{ view: 'graphs' }">
+          <i class="fa-solid fa-chart-simple"></i>
+          Graphs
+        </a>
+      }
+      @case ('graphs') {
+        <a class="button" queryParamsHandling="merge" [routerLink]="[]" [queryParams]="{ view: 'transactions' }">
+          <i class="fa-solid fa-money-bill"></i>
+          Transactions
+        </a>
+      }
+    }
   </div>
 
-  @if (combinedLoadingError(); as loadingError) {
+  @let _accountId = accountId();
+  @if (detailsLoadingError() === undefined && _accountId !== undefined) {
+    @switch (view()) {
+      @case ('transactions') {
+        <app-account-detail-transactions-table [accountId]="_accountId" />
+      }
+      @case ('graphs') {
+        <app-account-detail-graphs [accountId]="_accountId" />
+      }
+    }
+  }
+
+  @if (detailsLoadingError(); as loadingError) {
     <app-error-display [error]="loadingError">
       <ng-template #notFoundMessage>Account could not be found</ng-template>
     </app-error-display>
-  } @else if (loading() && transactions() === undefined) {
-    <app-loading-spinner />
-  } @else {
-    <app-transactions-table [transactions]="transactions()?.data ?? []" [disabled]="loading()" />
   }
 </div>

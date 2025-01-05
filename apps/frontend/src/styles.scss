@@ -39,13 +39,23 @@ html {
   box-sizing: border-box;
 }
 
-button {
+button,
+.button {
+  all: unset;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+
   background: var(--primary);
   color: var(--foreground);
   border: none;
   border-radius: 0.25em;
+  font-size: 0.85em;
   cursor: pointer;
   padding: 0.5em 1em;
+  user-select: none;
 
   transition: background 0.2s;
 
@@ -64,6 +74,11 @@ button {
     background: rgba(0, 0, 0, 0.1);
     cursor: default;
   }
+}
+
+a.button {
+  text-decoration: none;
+  color: inherit;
 }
 
 @keyframes spin {

@@ -1,9 +1,11 @@
 import { downloadBudget, init, q, runQuery, shutdown, sync } from '@actual-app/api';
 import { Query } from '@actual-app/api/@types/loot-core/shared/query';
 import { FilterParams } from '@app/shared-types';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as path from 'path';
+import { CashFlowEntry } from '../../transactions/dto/cash-flow-entry.dto';
+import { getDatesBetween, getDateString } from '../util/date.utils';
 import { PaginationParams } from '../util/pagination.utils';
 import { Account, Transaction } from './actual.models';
 
@@ -132,6 +134,64 @@ export class ActualService {
     return queryData.data.map((category) => category.name);
   }
 
+  async getCashFlowEntries(
+    accountId: string,
+    options: { startDate: string; endDate: string },
+  ): Promise<Array<CashFlowEntry>> {
+    const query = this.applyFilters(
+      q('transactions')
+        .filter({ account: { $eq: accountId } })
+        .select(['amount', 'date']),
+      [
+        {
+          property: 'date',
+          type: 'gte',
+          value: this.getDate(options.startDate),
+        },
+        {
+          property: 'date',
+          type: 'lte',
+          value: this.getDate(options.endDate),
+        },
+      ],
+    );
+
+    const transactions = await this.runQuery<Array<Pick<Transaction, 'amount' | 'date'>>>(query);
+
+    const startDate = new Date(options.startDate);
+    const endDate = new Date(options.endDate);
+
+    const cashFlowDict: Record<string, CashFlowEntry> = getDatesBetween(startDate, endDate).reduce<
+      Record<string, CashFlowEntry>
+    >((acc, currentDate) => {
+      const cashFlowTransaction = new CashFlowEntry();
+      cashFlowTransaction.date = getDateString(currentDate);
+      cashFlowTransaction.deposit = 0;
+      cashFlowTransaction.payment = 0;
+      return { ...acc, [cashFlowTransaction.date]: cashFlowTransaction };
+    }, {});
+
+    transactions.forEach((transaction) => {
+      let deposit = 0;
+      let payment = 0;
+
+      if (transaction.amount > 0) {
+        deposit = transaction.amount;
+      } else {
+        payment = -transaction.amount;
+      }
+
+      if (transaction.date in cashFlowDict) {
+        cashFlowDict[transaction.date].deposit += deposit;
+        cashFlowDict[transaction.date].payment += payment;
+      } else {
+        throw new InternalServerErrorException('Encountered transaction with date out of range');
+      }
+    });
+
+    return Object.values(cashFlowDict);
+  }
+
   async exportTransactionsCsvString(
     accountId: string,
     options: { startDate: string; endDate: string; filters?: Array<FilterParams> },
@@ -148,12 +208,12 @@ export class ActualService {
         {
           property: 'date',
           type: 'gte',
-          value: options.startDate,
+          value: this.getDate(options.startDate),
         },
         {
           property: 'date',
           type: 'lte',
-          value: options.endDate,
+          value: this.getDate(options.endDate),
         },
         ...(options.filters ?? []),
       ],
@@ -197,5 +257,15 @@ export class ActualService {
           return acc;
       }
     }, query);
+  }
+
+  private getDate(date: string): string {
+    const parsedDate = Date.parse(date);
+
+    if (isNaN(parsedDate)) {
+      throw new BadRequestException('Invalid date passed');
+    }
+
+    return getDateString(new Date(parsedDate));
   }
 }

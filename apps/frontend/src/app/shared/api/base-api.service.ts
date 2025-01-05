@@ -53,7 +53,7 @@ export class BaseApiService {
     });
 
     return this.http.request<T>(finalRequest).pipe(
-      shareReplay({ refCount: true }),
+      shareReplay({ refCount: true, bufferSize: 1 }),
       filter((response): response is HttpResponse<T> => response instanceof HttpResponse),
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       map((response: HttpResponse<T>) => (observeResponse ? response : response.body!)),

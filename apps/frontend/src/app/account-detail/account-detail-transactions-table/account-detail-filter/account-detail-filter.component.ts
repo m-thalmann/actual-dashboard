@@ -17,9 +17,12 @@ import {
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FilterParams } from '@app/shared-types';
 import { catchError, EMPTY, filter, map, Observable, of, shareReplay, switchMap, tap } from 'rxjs';
-import { TransactionsDataService } from '../../shared/api/transactions-data.service';
-import { InputFieldComponent } from '../../shared/components/input-field/input-field.component';
-import { SelectFieldComponent, SelectFieldOption } from '../../shared/components/select-field/select-field.component';
+import { TransactionsDataService } from '../../../shared/api/transactions-data.service';
+import { InputFieldComponent } from '../../../shared/components/input-field/input-field.component';
+import {
+  SelectFieldComponent,
+  SelectFieldOption,
+} from '../../../shared/components/select-field/select-field.component';
 
 @Component({
   selector: 'app-account-detail-filter',
@@ -51,7 +54,7 @@ export class AccountDetailFilterComponent {
     switchMap((id) => this.transactionsDataService.getCategories(id)),
     map((loadedCategories) => loadedCategories.data),
     tap(() => this.categoriesLoading.set(false)),
-    shareReplay({ refCount: true }),
+    shareReplay({ refCount: true, bufferSize: 1 }),
   );
 
   readonly categoriesLoadingError: Signal<Error | undefined> = toSignal(

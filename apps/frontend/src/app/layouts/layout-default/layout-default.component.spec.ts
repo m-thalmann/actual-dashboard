@@ -25,7 +25,7 @@ describe('LayoutDefaultComponent', () => {
     };
 
     mockLayoutFacadeService = {
-      showBackButton: signal(false),
+      backButtonUrl: signal(null),
       selectedAccount: signal(undefined),
     };
 

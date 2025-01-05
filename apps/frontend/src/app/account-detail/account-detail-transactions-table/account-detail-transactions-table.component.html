@@ -1,0 +1,31 @@
+<div class="container">
+  <div class="actions">
+    <div class="left-actions">
+      <app-account-detail-filter
+        [accountId]="accountId()"
+        [currentFilters]="filters()"
+        [disabled]="loading()"
+        (search)="doSearch($event)"
+        (categoryChange)="changeCategory($event)"
+      />
+
+      <app-account-detail-export (export)="downloadExport($event.startDate, $event.endDate)" />
+    </div>
+
+    <app-pagination
+      [page]="page()"
+      [totalPages]="transactions()?.meta?.lastPage ?? 0"
+      [disabled]="loading()"
+      (prevPage)="updatePage(page() - 1)"
+      (nextPage)="updatePage(page() + 1)"
+    />
+  </div>
+
+  @if (loadingError(); as error) {
+    <app-error-display [error]="error" />
+  } @else if (loading() && transactions() === undefined) {
+    <app-loading-spinner />
+  } @else {
+    <app-transactions-table [transactions]="transactions()?.data ?? []" [disabled]="loading()" />
+  }
+</div>

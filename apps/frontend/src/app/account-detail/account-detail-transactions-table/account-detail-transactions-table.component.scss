@@ -1,0 +1,25 @@
+:host {
+  display: block;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
+
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+
+    .left-actions {
+      display: flex;
+      gap: 2em;
+      align-items: end;
+    }
+  }
+
+  app-loading-spinner {
+    margin: 0 auto;
+  }
+}
