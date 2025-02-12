@@ -18,12 +18,14 @@ export class TransactionsDataService {
   ): Observable<ApiResponseWithMeta<Array<Transaction>, PaginationMeta>> {
     return this.baseApiService.get<ApiResponseWithMeta<Array<Transaction>, PaginationMeta>>(
       `accounts/${accountId}/transactions`,
-      options,
+      { ...options, emitReload: true },
     );
   }
 
   getCategories(accountId: string): Observable<ApiResponse<Array<string | null>>> {
-    return this.baseApiService.get<ApiResponse<Array<string | null>>>(`accounts/${accountId}/transactions/categories`);
+    return this.baseApiService.get<ApiResponse<Array<string | null>>>(`accounts/${accountId}/transactions/categories`, {
+      emitReload: true,
+    });
   }
 
   getCashFlow(
@@ -32,6 +34,7 @@ export class TransactionsDataService {
   ): Observable<ApiResponse<Array<CashFlowEntry>>> {
     return this.baseApiService.get<ApiResponse<Array<CashFlowEntry>>>(`accounts/${accountId}/transactions/cash-flow`, {
       queryParams: { 'start-date': options.startDate, 'end-date': options.endDate },
+      emitReload: true,
     });
   }
 

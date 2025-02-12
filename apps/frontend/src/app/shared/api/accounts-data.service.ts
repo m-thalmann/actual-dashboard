@@ -9,10 +9,10 @@ export class AccountsDataService {
   private readonly baseApiService: BaseApiService = inject(BaseApiService);
 
   getAccounts(): Observable<ApiResponse<Array<Account>>> {
-    return this.baseApiService.get<ApiResponse<Array<Account>>>(`accounts`);
+    return this.baseApiService.get<ApiResponse<Array<Account>>>(`accounts`, { emitReload: true });
   }
 
   getAccountDetails(accountId: string): Observable<ApiResponse<Account>> {
-    return this.baseApiService.get<ApiResponse<Account>>(`accounts/${accountId}`);
+    return this.baseApiService.get<ApiResponse<Account>>(`accounts/${accountId}`, { emitReload: true });
   }
 }

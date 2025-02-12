@@ -1,7 +1,7 @@
 import { HttpClient, HttpRequest, HttpResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { FilterParams } from '@app/shared-types';
-import { filter, first, map, Observable, shareReplay } from 'rxjs';
+import { filter, first, map, Observable, shareReplay, startWith, Subject, switchMap } from 'rxjs';
 import { API_BASE_URL } from '../../app.config';
 import { PaginationConfig } from '../models/pagination-config';
 
@@ -10,6 +10,7 @@ export interface RequestOptions {
   filters?: Array<FilterParams>;
   queryParams?: Record<string, string>;
   contentType?: string;
+  emitReload?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -18,6 +19,8 @@ export class BaseApiService {
 
   private readonly http: HttpClient = inject(HttpClient);
   private readonly apiUrl: string = inject(API_BASE_URL);
+
+  protected reload$: Subject<void> = new Subject<void>();
 
   protected request<T>(
     request: HttpRequest<unknown>,
@@ -52,13 +55,22 @@ export class BaseApiService {
       responseType: options?.contentType === undefined ? undefined : 'blob',
     });
 
-    return this.http.request<T>(finalRequest).pipe(
+    const requestObservable$ = this.http.request<T>(finalRequest).pipe(
       shareReplay({ refCount: true, bufferSize: 1 }),
       filter((response): response is HttpResponse<T> => response instanceof HttpResponse),
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       map((response: HttpResponse<T>) => (observeResponse ? response : response.body!)),
       first(),
     );
+
+    if (options?.emitReload) {
+      return this.reload$.pipe(
+        startWith(undefined),
+        switchMap(() => requestObservable$),
+      );
+    }
+
+    return requestObservable$;
   }
 
   get<T>(url: string, options?: RequestOptions): Observable<T> {
@@ -79,6 +91,10 @@ export class BaseApiService {
     observeResponse?: boolean,
   ): Observable<HttpResponse<T> | T> {
     return this.request<T>(new HttpRequest('POST', url, body), options, observeResponse);
+  }
+
+  reload(): void {
+    this.reload$.next();
   }
 
   protected generateFilterParams(filters?: Array<FilterParams>): Record<string, string> | null {
