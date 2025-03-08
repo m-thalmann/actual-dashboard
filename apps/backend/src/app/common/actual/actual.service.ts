@@ -1,4 +1,4 @@
-import { downloadBudget, init, q, runQuery, shutdown, sync } from '@actual-app/api';
+import { downloadBudget, getAccountBalance, init, q, runQuery, shutdown, sync } from '@actual-app/api';
 import { FilterParams } from '@app/shared-types';
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -90,6 +90,14 @@ export class ActualService {
     const queryData = (await runQuery(query)) as { data: Array<Account> };
 
     return queryData.data[0] ?? null;
+  }
+
+  async getAccountBalance(accountId: string, date?: Date): Promise<number> {
+    if (!this.isAllowedAccount(accountId)) {
+      return 0;
+    }
+
+    return await getAccountBalance(accountId, date);
   }
 
   async getTransactions(

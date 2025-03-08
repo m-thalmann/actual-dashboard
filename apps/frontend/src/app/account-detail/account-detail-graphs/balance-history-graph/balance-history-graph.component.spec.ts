@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import Chart from 'chart.js/auto';
 import { of } from 'rxjs';
-import { TransactionsDataService } from '../../../shared/api/transactions-data.service';
-import { CashFlowGraphComponent } from './cash-flow-graph.component';
+import { AccountsDataService } from '../../../shared/api/accounts-data.service';
+import { BalanceHistoryGraphComponent } from './balance-history-graph.component';
 
 jest.mock('chart.js/auto', () =>
   jest.fn().mockImplementation(() => ({
@@ -15,24 +15,24 @@ jest.mock('chart.js/auto', () =>
   })),
 );
 
-describe('CashFlowGraphComponent', () => {
-  let component: CashFlowGraphComponent;
-  let fixture: ComponentFixture<CashFlowGraphComponent>;
-  let mockTransactionsDataService: Partial<TransactionsDataService>;
+describe('BalanceHistoryGraphComponent', () => {
+  let component: BalanceHistoryGraphComponent;
+  let fixture: ComponentFixture<BalanceHistoryGraphComponent>;
+  let mockAccountsDataService: Partial<AccountsDataService>;
 
   beforeEach(async () => {
     (Chart as unknown as jest.Mock).mockClear();
 
-    mockTransactionsDataService = {
-      getCashFlow: jest.fn().mockReturnValue(of({ data: [] })),
+    mockAccountsDataService = {
+      getBalanceHistory: jest.fn().mockReturnValue(of({ data: [] })),
     };
 
     await TestBed.configureTestingModule({
-      imports: [CashFlowGraphComponent],
-      providers: [{ provide: TransactionsDataService, useValue: mockTransactionsDataService }],
+      imports: [BalanceHistoryGraphComponent],
+      providers: [{ provide: AccountsDataService, useValue: mockAccountsDataService }],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(CashFlowGraphComponent);
+    fixture = TestBed.createComponent(BalanceHistoryGraphComponent);
     component = fixture.componentInstance;
 
     fixture.componentRef.setInput('accountId', 'account1');

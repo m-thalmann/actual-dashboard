@@ -3,6 +3,7 @@
     #startDate
     label="Start date"
     type="date"
+    [value]="selectedTimeRange()?.startDate ?? ''"
     [disabled]="loading()"
     (valueChange)="updateTimeRange(startDate.value(), endDate.value())"
   />
@@ -10,13 +11,27 @@
     #endDate
     label="End date"
     type="date"
+    [value]="selectedTimeRange()?.endDate ?? ''"
     [disabled]="loading()"
     (valueChange)="updateTimeRange(startDate.value(), endDate.value())"
   />
+
+  <button [disabled]="loading()" (click)="selectYearToDate()">
+    <i class="fa-solid fa-calendar-week"></i>
+    Year to date
+  </button>
 </div>
 
-<app-cash-flow-graph
-  [timeRange]="selectedTimeRange()"
-  [accountId]="accountId()"
-  (loadingChanged)="cashFlowGraphLoading.set($event)"
-/>
+<div class="graphs">
+  <app-cash-flow-graph
+    [timeRange]="selectedTimeRange()"
+    [accountId]="accountId()"
+    (loadingChanged)="cashFlowGraphLoading.set($event)"
+  />
+
+  <app-balance-history-graph
+    [timeRange]="selectedTimeRange()"
+    [accountId]="accountId()"
+    (loadingChanged)="balanceHistoryGraphLoading.set($event)"
+  />
+</div>
