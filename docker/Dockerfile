@@ -6,6 +6,7 @@ WORKDIR /app/src
 COPY . .
 
 RUN npm ci
+RUN export NX_DAEMON=false
 RUN npx nx build backend
 RUN npx nx build frontend --baseHref /app/ --configuration docker
 
