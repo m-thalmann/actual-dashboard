@@ -1,14 +1,19 @@
-version: '3.4'
-
 services:
-  dashoard:
+  dashboard:
     build:
       context: ..
       dockerfile: docker/Dockerfile
 
     ports:
-      - 3000:3000
+      - '${PORT:-3000}:3000'
 
-    env_file: .env
+    environment:
+      APP_JWT_SECRET: ${APP_JWT_SECRET:-}
+      APP_USERS: ${APP_USERS:-}
+      ACTUAL_SERVER_URL: ${ACTUAL_SERVER_URL:-}
+      ACTUAL_SERVER_PASSWORD: ${ACTUAL_SERVER_PASSWORD:-}
+      ACTUAL_SERVER_FILE_PASSWORD: ${ACTUAL_SERVER_FILE_PASSWORD:-}
+      ACTUAL_SERVER_SYNC_ID: ${ACTUAL_SERVER_SYNC_ID:-}
+      ACTUAL_SERVER_ALLOWED_ACCOUNTS: ${ACTUAL_SERVER_ALLOWED_ACCOUNTS:-*}
 
     restart: no

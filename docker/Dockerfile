@@ -6,8 +6,8 @@ WORKDIR /app/src
 COPY . .
 
 RUN npm ci
-RUN npx nx build backend
-RUN npx nx build frontend --baseHref /app/ --configuration docker
+RUN NX_DAEMON=false npx nx build backend
+RUN NX_DAEMON=false npx nx build frontend --baseHref /app/ --configuration docker
 
 RUN cp -r dist/apps/frontend/browser/* dist/apps/backend/client
 
