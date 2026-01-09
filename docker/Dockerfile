@@ -1,11 +1,14 @@
 FROM node:20-alpine AS build
 
+ARG ACTUAL_VERSION=latest
+
 RUN mkdir -p /app/src
 WORKDIR /app/src
 
 COPY . .
 
 RUN npm ci
+RUN npm i @actual-app/api@${ACTUAL_VERSION}
 RUN NX_DAEMON=false npx nx build backend
 RUN NX_DAEMON=false npx nx build frontend --baseHref /app/ --configuration docker
 

@@ -26,4 +26,7 @@
 1. Copy the `.env.docker` file to `.env`
 1. Set the environment variables in the `.env` file
 1. Run the `docker compose up -d` command
+
+- Alternative: If you need to build for a different actual version than latest use `docker compose build --build-arg ACTUAL_VERSION=<your version>`
+
 1. Access the dashboard at http://localhost:3000

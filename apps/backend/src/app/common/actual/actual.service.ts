@@ -1,4 +1,4 @@
-import { downloadBudget, getAccountBalance, init, q, runQuery, shutdown, sync } from '@actual-app/api';
+import { aqlQuery, downloadBudget, getAccountBalance, init, q, shutdown, sync } from '@actual-app/api';
 import { FilterParams } from '@app/shared-types';
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -72,7 +72,7 @@ export class ActualService {
       .groupBy('account')
       .select([{ id: 'account' }, { name: 'account.name' }, { amount: { $sum: '$amount' } }]);
 
-    const queryData = (await runQuery(query)) as { data: Array<Account> };
+    const queryData = (await aqlQuery(query)) as { data: Array<Account> };
 
     return queryData.data;
   }
@@ -87,7 +87,7 @@ export class ActualService {
       .groupBy('account')
       .select([{ id: 'account' }, { name: 'account.name' }, { amount: { $sum: '$amount' } }]);
 
-    const queryData = (await runQuery(query)) as { data: Array<Account> };
+    const queryData = (await aqlQuery(query)) as { data: Array<Account> };
 
     return queryData.data[0] ?? null;
   }
@@ -139,7 +139,7 @@ export class ActualService {
       .groupBy('category')
       .select([{ name: 'category.name' }]);
 
-    const queryData = (await runQuery(query)) as { data: Array<{ name: string | null }> };
+    const queryData = (await aqlQuery(query)) as { data: Array<{ name: string | null }> };
 
     return queryData.data.map((category) => category.name);
   }
@@ -247,7 +247,7 @@ export class ActualService {
   }
 
   private async runQuery<T>(query: Query): Promise<T> {
-    const data = (await runQuery(query)) as { data: T };
+    const data = (await aqlQuery(query)) as { data: T };
 
     return data.data;
   }
